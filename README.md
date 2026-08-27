@@ -8,6 +8,8 @@ WorldFarm 是一个准备开发为农场类游戏的 Android App 工程。当前
 - App 名称：WorldFarm
 - 首页雏形：中国初始农田、世界地图解锁入口、重叠作物规则提示
 - 游戏设计文档：[design/WorldFarm_GameDesign.md](design/WorldFarm_GameDesign.md)
+- 地貌与变异设计：[design/WorldFarm_BiomeMutationDesign.md](design/WorldFarm_BiomeMutationDesign.md)
+- 国家与地貌设计：[design/WorldFarm_CountryBiomeDesign.md](design/WorldFarm_CountryBiomeDesign.md)
 
 ## 构建
 
