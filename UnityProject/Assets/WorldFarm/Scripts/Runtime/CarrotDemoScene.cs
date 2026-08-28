@@ -465,10 +465,9 @@ namespace WorldFarm.Runtime
 
         private static Vector3 CarrotCenter(float t)
         {
-            var bend = Mathf.Sin(t * Mathf.PI) * 0.10f + t * t * 0.05f;
-            var topDomeLift = 0.05f * (1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / 0.18f)));
-            var bottomDomeDrop = 0.06f * Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((t - 0.86f) / 0.14f));
-            return new Vector3(bend, CarrotTopY + topDomeLift - t * CarrotHeight - bottomDomeDrop, 0f);
+            var bend = Mathf.Sin(t * Mathf.PI) * 0.08f + t * t * 0.04f;
+            var bottomDrop = 0.035f * Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((t - 0.86f) / 0.14f));
+            return new Vector3(bend, CarrotTopY - t * CarrotHeight - bottomDrop, 0f);
         }
 
         private static float CarrotRadius(float t)
@@ -476,18 +475,19 @@ namespace WorldFarm.Runtime
             float radius;
             if (t < 0.18f)
             {
-                radius = Mathf.Lerp(0.34f, 0.82f, Mathf.SmoothStep(0f, 1f, t / 0.18f));
+                radius = Mathf.Lerp(0.42f, 0.84f, Mathf.SmoothStep(0f, 1f, t / 0.18f));
             }
-            else if (t < 0.78f)
+            else if (t < 0.50f)
             {
-                radius = Mathf.Lerp(0.82f, 0.50f, Mathf.SmoothStep(0f, 1f, (t - 0.18f) / 0.60f));
+                radius = Mathf.Lerp(0.84f, 0.76f, Mathf.SmoothStep(0f, 1f, (t - 0.18f) / 0.32f));
             }
             else
             {
-                radius = Mathf.Lerp(0.50f, 0.18f, Mathf.SmoothStep(0f, 1f, (t - 0.78f) / 0.22f));
+                var bottomToBelly = Mathf.Clamp01((1f - t) / 0.50f);
+                radius = Mathf.Lerp(0.22f, 0.76f, Mathf.Pow(bottomToBelly, 0.55f));
             }
 
-            var ridge = 1f + 0.003f * Mathf.Sin(t * 30f);
+            var ridge = 1f + 0.002f * Mathf.Sin(t * 24f);
             return radius * ridge;
         }
 
