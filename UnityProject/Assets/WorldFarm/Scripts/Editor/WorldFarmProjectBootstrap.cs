@@ -4,6 +4,8 @@ using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.Rendering;
+using WorldFarm.Runtime;
 
 namespace WorldFarm.Editor
 {
@@ -68,14 +70,15 @@ namespace WorldFarm.Editor
 
         private static void EnsureMainScene()
         {
-            Directory.CreateDirectory(Path.GetDirectoryName(MainScenePath));
+            Directory.CreateDirectory(Path.GetDirectoryName(ToAbsoluteProjectPath(MainScenePath)));
 
-            if (!File.Exists(MainScenePath))
-            {
-                var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
-                ConfigureDefaultSceneObjects();
-                EditorSceneManager.SaveScene(scene, MainScenePath);
-            }
+            var scene = File.Exists(ToAbsoluteProjectPath(MainScenePath))
+                ? EditorSceneManager.OpenScene(MainScenePath, OpenSceneMode.Single)
+                : EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+
+            ConfigureDefaultSceneObjects();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene, MainScenePath);
 
             EditorBuildSettings.scenes = new[]
             {
@@ -85,21 +88,96 @@ namespace WorldFarm.Editor
 
         private static void ConfigureDefaultSceneObjects()
         {
+            RenderSettings.ambientMode = AmbientMode.Trilight;
+            RenderSettings.ambientSkyColor = new Color(0.78f, 0.88f, 0.92f);
+            RenderSettings.ambientEquatorColor = new Color(0.48f, 0.56f, 0.50f);
+            RenderSettings.ambientGroundColor = new Color(0.28f, 0.22f, 0.18f);
+            RenderSettings.ambientIntensity = 1.1f;
+
             var camera = Camera.main;
-            if (camera != null)
+            if (camera == null)
             {
-                camera.orthographic = true;
-                camera.orthographicSize = 5.5f;
-                camera.transform.position = new Vector3(0f, 0f, -10f);
-                camera.backgroundColor = new Color(0.56f, 0.72f, 0.78f);
+                camera = Object.FindObjectOfType<Camera>();
             }
 
-            var root = new GameObject("WorldFarmRoot");
-            root.transform.position = Vector3.zero;
+            if (camera == null)
+            {
+                camera = new GameObject("Main Camera").AddComponent<Camera>();
+            }
 
-            new GameObject("MapLayer").transform.SetParent(root.transform);
-            new GameObject("CropLayer").transform.SetParent(root.transform);
-            new GameObject("UILayer").transform.SetParent(root.transform);
+            camera.gameObject.tag = "MainCamera";
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.orthographic = false;
+            camera.fieldOfView = 38f;
+            camera.nearClipPlane = 0.1f;
+            camera.farClipPlane = 80f;
+            camera.transform.position = new Vector3(0f, 0.35f, -8.5f);
+            camera.transform.rotation = Quaternion.LookRotation(new Vector3(0f, -0.1f, 0f) - camera.transform.position, Vector3.up);
+            camera.backgroundColor = new Color(0.62f, 0.77f, 0.82f);
+
+            var keyLightObject = GameObject.Find("Demo Key Light") ?? GameObject.Find("Directional Light") ?? new GameObject("Demo Key Light");
+            keyLightObject.name = "Demo Key Light";
+
+            var keyLight = keyLightObject.GetComponent<Light>();
+            if (keyLight == null)
+            {
+                keyLight = keyLightObject.AddComponent<Light>();
+            }
+
+            keyLight.type = LightType.Directional;
+            keyLight.color = new Color(1f, 0.94f, 0.82f);
+            keyLight.intensity = 1.35f;
+            keyLight.shadows = LightShadows.Soft;
+            keyLight.shadowStrength = 0.55f;
+            keyLightObject.transform.rotation = Quaternion.Euler(48f, -34f, 18f);
+
+            var fillLightObject = GameObject.Find("Demo Fill Light") ?? new GameObject("Demo Fill Light");
+            var fillLight = fillLightObject.GetComponent<Light>();
+            if (fillLight == null)
+            {
+                fillLight = fillLightObject.AddComponent<Light>();
+            }
+
+            fillLight.type = LightType.Point;
+            fillLight.color = new Color(0.58f, 0.82f, 1f);
+            fillLight.intensity = 1.6f;
+            fillLight.range = 8f;
+            fillLight.shadows = LightShadows.None;
+            fillLightObject.transform.position = new Vector3(-2.5f, 2.8f, -3.2f);
+
+            var root = GameObject.Find("WorldFarmRoot") ?? new GameObject("WorldFarmRoot");
+            root.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+            EnsureChild(root.transform, "MapLayer");
+            EnsureChild(root.transform, "CropLayer");
+            EnsureChild(root.transform, "UILayer");
+
+            var demoScene = root.GetComponent<CarrotDemoScene>();
+            if (demoScene == null)
+            {
+                demoScene = root.AddComponent<CarrotDemoScene>();
+            }
+
+            var duplicateDemoScenes = root.GetComponents<CarrotDemoScene>();
+            for (var index = 1; index < duplicateDemoScenes.Length; index++)
+            {
+                Object.DestroyImmediate(duplicateDemoScenes[index]);
+            }
+        }
+
+        private static void EnsureChild(Transform parent, string childName)
+        {
+            if (parent.Find(childName) != null)
+            {
+                return;
+            }
+
+            new GameObject(childName).transform.SetParent(parent, false);
+        }
+
+        private static string ToAbsoluteProjectPath(string assetPath)
+        {
+            return Path.GetFullPath(Path.Combine(Application.dataPath, "..", assetPath));
         }
 
         private static void SwitchToAndroidTarget()
