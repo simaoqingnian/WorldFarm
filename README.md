@@ -13,7 +13,8 @@ WorldFarm 是一款准备使用 Unity 开发的农场经营游戏。玩家从中
 - [游戏总设计](design/WorldFarm_GameDesign.md)
 - [地貌与变异设计](design/WorldFarm_BiomeMutationDesign.md)
 - [国家与地貌设计](design/WorldFarm_CountryBiomeDesign.md)
+- [3D 资产开发流程与风格规范](design/WorldFarm_3DAssetPipeline.md)
 
 ## Unity 环境
 
-推荐使用 Unity 6 LTS，并安装 Android Build Support、Android SDK & NDK Tools、OpenJDK。Android 包由 Unity 构建，不再使用原生 Android Gradle 工程作为主工程。
+当前工程使用 Tuanjie/Unity 兼容工作流开发，已在本机安装 Tuanjie `2022.3.62t14`，并配置 Android Build Support、Android SDK & NDK Tools、OpenJDK。Android 包由 Tuanjie/Unity 构建，不再使用原生 Android Gradle 工程作为主工程。
