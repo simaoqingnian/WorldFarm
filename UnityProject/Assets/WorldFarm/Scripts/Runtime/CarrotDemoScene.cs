@@ -262,23 +262,19 @@ namespace WorldFarm.Runtime
 
         private static Mesh CreateCarrotBodyMesh(int radialSegments, int heightSegments)
         {
-            var ringCount = heightSegments - 1;
+            var ringCount = heightSegments + 1;
             var vertices = new Vector3[ringCount * radialSegments + 2];
             var uvs = new Vector2[vertices.Length];
-            var triangles = new int[ringCount * radialSegments * 6];
+            var triangles = new int[(ringCount - 1) * radialSegments * 6 + radialSegments * 6];
 
-            var topPoleIndex = 0;
-            vertices[topPoleIndex] = CarrotCenter(0f);
-            uvs[topPoleIndex] = new Vector2(0.5f, 0f);
-
-            for (var y = 1; y < heightSegments; y++)
+            for (var y = 0; y < ringCount; y++)
             {
                 var t = y / (float)heightSegments;
                 var center = CarrotCenter(t);
                 var radius = CarrotRadius(t);
                 var squashX = Mathf.Lerp(1.02f, 0.94f, t);
                 var squashZ = Mathf.Lerp(1.06f, 0.98f, t);
-                var ringStartIndex = 1 + (y - 1) * radialSegments;
+                var ringStartIndex = y * radialSegments;
 
                 for (var r = 0; r < radialSegments; r++)
                 {
@@ -292,28 +288,24 @@ namespace WorldFarm.Runtime
                 }
             }
 
-            var bottomPoleIndex = vertices.Length - 1;
-            vertices[bottomPoleIndex] = CarrotCenter(1f);
-            uvs[bottomPoleIndex] = new Vector2(0.5f, 1f);
+            var topCapIndex = vertices.Length - 2;
+            vertices[topCapIndex] = CarrotCenter(0f) + new Vector3(0f, -0.035f, 0f);
+            uvs[topCapIndex] = new Vector2(0.5f, 0f);
+
+            var bottomCapIndex = vertices.Length - 1;
+            vertices[bottomCapIndex] = CarrotCenter(1f) + new Vector3(0f, 0.018f, 0f);
+            uvs[bottomCapIndex] = new Vector2(0.5f, 1f);
 
             var triangleIndex = 0;
-            for (var r = 0; r < radialSegments; r++)
-            {
-                var nextR = (r + 1) % radialSegments;
-                triangles[triangleIndex++] = topPoleIndex;
-                triangles[triangleIndex++] = 1 + nextR;
-                triangles[triangleIndex++] = 1 + r;
-            }
-
             for (var ring = 0; ring < ringCount - 1; ring++)
             {
                 for (var r = 0; r < radialSegments; r++)
                 {
                     var nextR = (r + 1) % radialSegments;
-                    var a = 1 + ring * radialSegments + r;
-                    var b = 1 + ring * radialSegments + nextR;
-                    var c = 1 + (ring + 1) * radialSegments + r;
-                    var d = 1 + (ring + 1) * radialSegments + nextR;
+                    var a = ring * radialSegments + r;
+                    var b = ring * radialSegments + nextR;
+                    var c = (ring + 1) * radialSegments + r;
+                    var d = (ring + 1) * radialSegments + nextR;
 
                     triangles[triangleIndex++] = a;
                     triangles[triangleIndex++] = b;
@@ -325,11 +317,15 @@ namespace WorldFarm.Runtime
                 }
             }
 
-            var bottomRingStart = 1 + (ringCount - 1) * radialSegments;
             for (var r = 0; r < radialSegments; r++)
             {
                 var nextR = (r + 1) % radialSegments;
-                triangles[triangleIndex++] = bottomPoleIndex;
+                triangles[triangleIndex++] = topCapIndex;
+                triangles[triangleIndex++] = nextR;
+                triangles[triangleIndex++] = r;
+
+                var bottomRingStart = (ringCount - 1) * radialSegments;
+                triangles[triangleIndex++] = bottomCapIndex;
                 triangles[triangleIndex++] = bottomRingStart + r;
                 triangles[triangleIndex++] = bottomRingStart + nextR;
             }
@@ -470,30 +466,25 @@ namespace WorldFarm.Runtime
         private static Vector3 CarrotCenter(float t)
         {
             var bend = Mathf.Sin(t * Mathf.PI) * 0.10f + t * t * 0.05f;
-            var topDomeLift = 0.13f * (1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / 0.18f)));
-            var bottomDomeDrop = 0.10f * Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((t - 0.84f) / 0.16f));
+            var topDomeLift = 0.05f * (1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / 0.18f)));
+            var bottomDomeDrop = 0.06f * Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((t - 0.86f) / 0.14f));
             return new Vector3(bend, CarrotTopY + topDomeLift - t * CarrotHeight - bottomDomeDrop, 0f);
         }
 
         private static float CarrotRadius(float t)
         {
-            if (t <= 0f || t >= 1f)
-            {
-                return 0f;
-            }
-
             float radius;
             if (t < 0.18f)
             {
-                radius = Mathf.Lerp(0.08f, 0.76f, Mathf.SmoothStep(0f, 1f, t / 0.18f));
+                radius = Mathf.Lerp(0.34f, 0.82f, Mathf.SmoothStep(0f, 1f, t / 0.18f));
             }
             else if (t < 0.78f)
             {
-                radius = Mathf.Lerp(0.76f, 0.44f, Mathf.SmoothStep(0f, 1f, (t - 0.18f) / 0.60f));
+                radius = Mathf.Lerp(0.82f, 0.50f, Mathf.SmoothStep(0f, 1f, (t - 0.18f) / 0.60f));
             }
             else
             {
-                radius = Mathf.Lerp(0.44f, 0.03f, Mathf.SmoothStep(0f, 1f, (t - 0.78f) / 0.22f));
+                radius = Mathf.Lerp(0.50f, 0.18f, Mathf.SmoothStep(0f, 1f, (t - 0.78f) / 0.22f));
             }
 
             var ridge = 1f + 0.003f * Mathf.Sin(t * 30f);
