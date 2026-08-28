@@ -1,0 +1,18 @@
+{
+  "name": "WorldFarm.Editor",
+  "rootNamespace": "WorldFarm.Editor",
+  "references": [
+    "WorldFarm"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

@@ -38,3 +38,6 @@ crashlytics-build.properties
 # Android export output from Unity
 [Ee]xported[Aa]ndroid/
 [Gg]radle[Bb]uild/
+
+# Local setup logs
+tools/install-logs/
