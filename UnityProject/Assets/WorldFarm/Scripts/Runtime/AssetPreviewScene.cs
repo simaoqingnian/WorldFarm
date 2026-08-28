@@ -8,8 +8,8 @@ namespace WorldFarm.Runtime
     public sealed class AssetPreviewScene : MonoBehaviour
     {
         private const string GeneratedRootName = "GeneratedAssetPreview";
-        private const float CarrotTopY = 1.12f;
-        private const float CarrotHeight = 3.10f;
+        private const float CarrotTopY = 0.98f;
+        private const float CarrotHeight = 2.72f;
 
         [SerializeField] private float autoRotateDegreesPerSecond = 10f;
         [SerializeField] private float dragDegreesPerPixel = 0.18f;
@@ -216,13 +216,11 @@ namespace WorldFarm.Runtime
         {
             var model = new GameObject("Asset_Carrot_Baseline").transform;
             model.SetParent(parent, false);
-            model.localPosition = new Vector3(0f, 0.62f, 0f);
-            model.localRotation = Quaternion.Euler(0f, 0f, -4f);
+            model.localPosition = new Vector3(0f, 0.54f, 0f);
+            model.localRotation = Quaternion.Euler(0f, 0f, -3f);
             model.localScale = Vector3.one * scale;
 
-            AddMeshObject("CarrotBody", CreateCarrotBodyMesh(72, 36), materials.CarrotBody, model, Vector3.zero, Quaternion.identity);
-            AddPrimitive("CarrotRoundedShoulder", PrimitiveType.Sphere, materials.CarrotBody, model, CarrotCenter(0f) + new Vector3(-0.02f, -0.01f, 0f), Quaternion.identity, new Vector3(1.50f, 0.46f, 1.42f));
-            AddPrimitive("CarrotRoundedTip", PrimitiveType.Sphere, materials.CarrotBody, model, CarrotCenter(1f) + new Vector3(0.03f, 0.025f, 0f), Quaternion.identity, new Vector3(0.30f, 0.24f, 0.30f));
+            AddMeshObject("CarrotBody", CreateCarrotBodyMesh(72, 40), materials.CarrotBody, model, Vector3.zero, Quaternion.identity);
             AddCarrotGrowthRings(model, materials.CarrotRidge);
             AddCarrotLeafCluster(model, materials.Leaf, materials.LeafDark);
         }
@@ -513,49 +511,58 @@ namespace WorldFarm.Runtime
 
         private static Mesh CreateCarrotBodyMesh(int radialSegments, int heightSegments)
         {
-            var vertices = new Vector3[(heightSegments + 1) * radialSegments + 2];
+            var ringCount = heightSegments - 1;
+            var vertices = new Vector3[ringCount * radialSegments + 2];
             var uvs = new Vector2[vertices.Length];
-            var triangles = new int[heightSegments * radialSegments * 6 + radialSegments * 6];
+            var triangles = new int[ringCount * radialSegments * 6];
 
-            var vertexIndex = 0;
-            for (var y = 0; y <= heightSegments; y++)
+            var topPoleIndex = 0;
+            vertices[topPoleIndex] = CarrotCenter(0f);
+            uvs[topPoleIndex] = new Vector2(0.5f, 0f);
+
+            for (var y = 1; y < heightSegments; y++)
             {
                 var t = y / (float)heightSegments;
                 var center = CarrotCenter(t);
                 var radius = CarrotRadius(t);
-                var squashX = Mathf.Lerp(0.98f, 0.90f, t);
-                var squashZ = Mathf.Lerp(1.02f, 0.98f, t);
+                var squashX = Mathf.Lerp(1.02f, 0.94f, t);
+                var squashZ = Mathf.Lerp(1.06f, 0.98f, t);
+                var ringStartIndex = 1 + (y - 1) * radialSegments;
 
                 for (var r = 0; r < radialSegments; r++)
                 {
                     var angle = Mathf.PI * 2f * r / radialSegments;
-                    var ringVariation = 1f + 0.006f * Mathf.Sin(angle * 2f + t * 8f);
+                    var ringVariation = 1f + 0.003f * Mathf.Sin(angle * 2f + t * 7f);
                     var x = Mathf.Cos(angle) * radius * squashX * ringVariation;
                     var z = Mathf.Sin(angle) * radius * squashZ * ringVariation;
+                    var vertexIndex = ringStartIndex + r;
                     vertices[vertexIndex] = center + new Vector3(x, 0f, z);
                     uvs[vertexIndex] = new Vector2(r / (float)radialSegments, t);
-                    vertexIndex++;
                 }
             }
 
-            var topCenterIndex = vertexIndex++;
-            vertices[topCenterIndex] = CarrotCenter(0f);
-            uvs[topCenterIndex] = new Vector2(0.5f, 0f);
-
-            var tipCenterIndex = vertexIndex;
-            vertices[tipCenterIndex] = CarrotCenter(1f);
-            uvs[tipCenterIndex] = new Vector2(0.5f, 1f);
+            var bottomPoleIndex = vertices.Length - 1;
+            vertices[bottomPoleIndex] = CarrotCenter(1f);
+            uvs[bottomPoleIndex] = new Vector2(0.5f, 1f);
 
             var triangleIndex = 0;
-            for (var y = 0; y < heightSegments; y++)
+            for (var r = 0; r < radialSegments; r++)
+            {
+                var nextR = (r + 1) % radialSegments;
+                triangles[triangleIndex++] = topPoleIndex;
+                triangles[triangleIndex++] = 1 + nextR;
+                triangles[triangleIndex++] = 1 + r;
+            }
+
+            for (var ring = 0; ring < ringCount - 1; ring++)
             {
                 for (var r = 0; r < radialSegments; r++)
                 {
                     var nextR = (r + 1) % radialSegments;
-                    var a = y * radialSegments + r;
-                    var b = y * radialSegments + nextR;
-                    var c = (y + 1) * radialSegments + r;
-                    var d = (y + 1) * radialSegments + nextR;
+                    var a = 1 + ring * radialSegments + r;
+                    var b = 1 + ring * radialSegments + nextR;
+                    var c = 1 + (ring + 1) * radialSegments + r;
+                    var d = 1 + (ring + 1) * radialSegments + nextR;
 
                     triangles[triangleIndex++] = a;
                     triangles[triangleIndex++] = b;
@@ -567,18 +574,13 @@ namespace WorldFarm.Runtime
                 }
             }
 
-            var bottomStart = heightSegments * radialSegments;
+            var bottomRingStart = 1 + (ringCount - 1) * radialSegments;
             for (var r = 0; r < radialSegments; r++)
             {
                 var nextR = (r + 1) % radialSegments;
-
-                triangles[triangleIndex++] = topCenterIndex;
-                triangles[triangleIndex++] = nextR;
-                triangles[triangleIndex++] = r;
-
-                triangles[triangleIndex++] = tipCenterIndex;
-                triangles[triangleIndex++] = bottomStart + r;
-                triangles[triangleIndex++] = bottomStart + nextR;
+                triangles[triangleIndex++] = bottomPoleIndex;
+                triangles[triangleIndex++] = bottomRingStart + r;
+                triangles[triangleIndex++] = bottomRingStart + nextR;
             }
 
             return FinalizeMesh("Preview Carrot Body", vertices, uvs, triangles);
@@ -699,16 +701,35 @@ namespace WorldFarm.Runtime
 
         private static Vector3 CarrotCenter(float t)
         {
-            var bend = Mathf.Sin(t * Mathf.PI) * 0.18f + t * t * 0.1f;
-            return new Vector3(bend, CarrotTopY - t * CarrotHeight, 0f);
+            var bend = Mathf.Sin(t * Mathf.PI) * 0.10f + t * t * 0.05f;
+            var topDomeLift = 0.13f * (1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(t / 0.18f)));
+            var bottomDomeDrop = 0.10f * Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((t - 0.84f) / 0.16f));
+            return new Vector3(bend, CarrotTopY + topDomeLift - t * CarrotHeight - bottomDomeDrop, 0f);
         }
 
         private static float CarrotRadius(float t)
         {
-            var taper = Mathf.Lerp(0.64f, 0.12f, Mathf.Pow(t, 0.94f));
-            var shoulder = 1f + 0.12f * Mathf.Exp(-Mathf.Pow((t - 0.15f) / 0.18f, 2f));
-            var ridge = 1f + 0.006f * Mathf.Sin(t * 38f) + 0.003f * Mathf.Sin(t * 83f);
-            return Mathf.Max(0.105f, taper * shoulder * ridge);
+            if (t <= 0f || t >= 1f)
+            {
+                return 0f;
+            }
+
+            float radius;
+            if (t < 0.18f)
+            {
+                radius = Mathf.Lerp(0.08f, 0.76f, Mathf.SmoothStep(0f, 1f, t / 0.18f));
+            }
+            else if (t < 0.78f)
+            {
+                radius = Mathf.Lerp(0.76f, 0.44f, Mathf.SmoothStep(0f, 1f, (t - 0.18f) / 0.60f));
+            }
+            else
+            {
+                radius = Mathf.Lerp(0.44f, 0.03f, Mathf.SmoothStep(0f, 1f, (t - 0.78f) / 0.22f));
+            }
+
+            var ridge = 1f + 0.003f * Mathf.Sin(t * 30f);
+            return radius * ridge;
         }
 
         private void HandlePointerInput()
