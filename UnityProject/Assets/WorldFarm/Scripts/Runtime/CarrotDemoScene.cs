@@ -7,8 +7,8 @@ namespace WorldFarm.Runtime
     public sealed class CarrotDemoScene : MonoBehaviour
     {
         private const string GeneratedRootName = "GeneratedCarrotDemo";
-        private const float CarrotTopY = 1.35f;
-        private const float CarrotHeight = 3.85f;
+        private const float CarrotTopY = 1.12f;
+        private const float CarrotHeight = 3.10f;
 
         [SerializeField] private float autoRotateDegreesPerSecond = 16f;
         [SerializeField] private float dragDegreesPerPixel = 0.18f;
@@ -117,7 +117,8 @@ namespace WorldFarm.Runtime
             var soilMaterial = CreateMaterial("Demo Warm Soil", new Color(0.42f, 0.29f, 0.18f), 0.18f);
 
             AddMeshObject("CarrotBody", CreateCarrotBodyMesh(72, 36), carrotMaterial, carrotPivot, Vector3.zero, Quaternion.identity);
-            AddPrimitive("CarrotRoundedTip", PrimitiveType.Sphere, carrotMaterial, carrotPivot, CarrotCenter(1f) + new Vector3(0.01f, 0.035f, 0f), Quaternion.identity, new Vector3(0.13f, 0.10f, 0.13f));
+            AddPrimitive("CarrotRoundedShoulder", PrimitiveType.Sphere, carrotMaterial, carrotPivot, CarrotCenter(0f) + new Vector3(-0.02f, -0.01f, 0f), Quaternion.identity, new Vector3(1.50f, 0.46f, 1.42f));
+            AddPrimitive("CarrotRoundedTip", PrimitiveType.Sphere, carrotMaterial, carrotPivot, CarrotCenter(1f) + new Vector3(0.03f, 0.025f, 0f), Quaternion.identity, new Vector3(0.30f, 0.24f, 0.30f));
             AddGrowthRings(carrotPivot, carrotShadowMaterial);
             AddLeafCluster(carrotPivot, leafMaterial, leafDarkMaterial);
             AddGroundPlane(generatedRoot.transform, soilMaterial);
@@ -196,11 +197,11 @@ namespace WorldFarm.Runtime
 
         private static void AddGrowthRings(Transform parent, Material material)
         {
-            for (var index = 0; index < 9; index++)
+            for (var index = 0; index < 6; index++)
             {
-                var t = 0.16f + index * 0.078f;
-                var radius = CarrotRadius(t) * 1.012f;
-                var tubeRadius = Mathf.Lerp(0.010f, 0.004f, t);
+                var t = 0.24f + index * 0.095f;
+                var radius = CarrotRadius(t) * 1.008f;
+                var tubeRadius = Mathf.Lerp(0.007f, 0.003f, t);
                 var ring = AddMeshObject(
                     $"GrowthRing_{index:00}",
                     CreateTorusMesh(radius, tubeRadius, 72, 8),
@@ -215,12 +216,12 @@ namespace WorldFarm.Runtime
 
         private static void AddLeafCluster(Transform parent, Material primaryMaterial, Material darkMaterial)
         {
-            var crownPosition = CarrotCenter(0f) + new Vector3(0f, 0.05f, 0f);
+            var crownPosition = CarrotCenter(0f) + new Vector3(0f, 0.17f, 0f);
             var crown = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             crown.name = "LeafCrown";
             crown.transform.SetParent(parent, false);
             crown.transform.localPosition = crownPosition;
-            crown.transform.localScale = new Vector3(0.40f, 0.18f, 0.40f);
+            crown.transform.localScale = new Vector3(0.34f, 0.15f, 0.34f);
             crown.GetComponent<MeshRenderer>().sharedMaterial = darkMaterial;
             crown.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.On;
             crown.GetComponent<MeshRenderer>().receiveShadows = true;
@@ -228,9 +229,9 @@ namespace WorldFarm.Runtime
             var angles = new[] { -8f, 44f, 96f, 148f, 204f, 260f, 316f };
             for (var index = 0; index < angles.Length; index++)
             {
-                var length = Mathf.Lerp(0.82f, 1.18f, index / (float)(angles.Length - 1));
-                var height = index % 2 == 0 ? 1.02f : 0.82f;
-                var width = index % 3 == 0 ? 0.16f : 0.13f;
+                var length = Mathf.Lerp(0.68f, 0.96f, index / (float)(angles.Length - 1));
+                var height = index % 2 == 0 ? 0.82f : 0.66f;
+                var width = index % 3 == 0 ? 0.14f : 0.11f;
                 var curve = index % 2 == 0 ? 0.16f : -0.13f;
                 var material = index % 2 == 0 ? primaryMaterial : darkMaterial;
 
@@ -489,10 +490,10 @@ namespace WorldFarm.Runtime
 
         private static float CarrotRadius(float t)
         {
-            var taper = Mathf.Lerp(0.70f, 0.075f, Mathf.Pow(t, 0.88f));
-            var shoulder = 1f + 0.10f * Mathf.Exp(-Mathf.Pow((t - 0.13f) / 0.17f, 2f));
-            var ridge = 1f + 0.010f * Mathf.Sin(t * 42f) + 0.004f * Mathf.Sin(t * 101f);
-            return Mathf.Max(0.060f, taper * shoulder * ridge);
+            var taper = Mathf.Lerp(0.64f, 0.12f, Mathf.Pow(t, 0.94f));
+            var shoulder = 1f + 0.12f * Mathf.Exp(-Mathf.Pow((t - 0.15f) / 0.18f, 2f));
+            var ridge = 1f + 0.006f * Mathf.Sin(t * 38f) + 0.003f * Mathf.Sin(t * 83f);
+            return Mathf.Max(0.105f, taper * shoulder * ridge);
         }
 
         private void HandlePointerInput()
