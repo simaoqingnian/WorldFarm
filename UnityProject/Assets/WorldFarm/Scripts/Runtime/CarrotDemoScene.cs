@@ -111,13 +111,11 @@ namespace WorldFarm.Runtime
             carrotPivot.localPosition = Vector3.zero;
 
             var carrotMaterial = CreateMaterial("Demo Carrot Body", new Color(0.93f, 0.37f, 0.09f), 0.32f);
-            var carrotShadowMaterial = CreateMaterial("Demo Carrot Soft Ridges", new Color(0.70f, 0.25f, 0.06f), 0.24f);
             var leafMaterial = CreateMaterial("Demo Leaf Primary", new Color(0.16f, 0.56f, 0.24f), 0.42f, true);
             var leafDarkMaterial = CreateMaterial("Demo Leaf Deep Green", new Color(0.06f, 0.34f, 0.16f), 0.35f, true);
             var soilMaterial = CreateMaterial("Demo Warm Soil", new Color(0.42f, 0.29f, 0.18f), 0.18f);
 
             AddMeshObject("CarrotBody", CreateCarrotBodyMesh(72, 40), carrotMaterial, carrotPivot, Vector3.zero, Quaternion.identity);
-            AddGrowthRings(carrotPivot, carrotShadowMaterial);
             AddLeafCluster(carrotPivot, leafMaterial, leafDarkMaterial);
             AddGroundPlane(generatedRoot.transform, soilMaterial);
         }
@@ -214,12 +212,12 @@ namespace WorldFarm.Runtime
 
         private static void AddLeafCluster(Transform parent, Material primaryMaterial, Material darkMaterial)
         {
-            var crownPosition = CarrotCenter(0f) + new Vector3(0f, 0.17f, 0f);
+            var crownPosition = CarrotCenter(0f) + new Vector3(0f, 0.08f, 0f);
             var crown = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             crown.name = "LeafCrown";
             crown.transform.SetParent(parent, false);
             crown.transform.localPosition = crownPosition;
-            crown.transform.localScale = new Vector3(0.34f, 0.15f, 0.34f);
+            crown.transform.localScale = new Vector3(0.30f, 0.12f, 0.30f);
             crown.GetComponent<MeshRenderer>().sharedMaterial = darkMaterial;
             crown.GetComponent<MeshRenderer>().shadowCastingMode = ShadowCastingMode.On;
             crown.GetComponent<MeshRenderer>().receiveShadows = true;
@@ -238,7 +236,7 @@ namespace WorldFarm.Runtime
                     CreateLeafMesh(length, height, width, curve, 8),
                     material,
                     parent,
-                    crownPosition + new Vector3(0f, 0.03f, 0f),
+                    crownPosition + new Vector3(0f, 0.02f, 0f),
                     Quaternion.Euler(4f, angles[index], 0f));
 
                 leaf.GetComponent<MeshRenderer>().receiveShadows = false;
@@ -279,7 +277,7 @@ namespace WorldFarm.Runtime
                 for (var r = 0; r < radialSegments; r++)
                 {
                     var angle = Mathf.PI * 2f * r / radialSegments;
-                    var ringVariation = 1f + 0.003f * Mathf.Sin(angle * 2f + t * 7f);
+                    var ringVariation = 1f + 0.001f * Mathf.Sin(angle * 2f + t * 7f);
                     var x = Mathf.Cos(angle) * radius * squashX * ringVariation;
                     var z = Mathf.Sin(angle) * radius * squashZ * ringVariation;
                     var vertexIndex = ringStartIndex + r;
@@ -289,7 +287,7 @@ namespace WorldFarm.Runtime
             }
 
             var topCapIndex = vertices.Length - 2;
-            vertices[topCapIndex] = CarrotCenter(0f) + new Vector3(0f, -0.035f, 0f);
+            vertices[topCapIndex] = CarrotCenter(0f) + new Vector3(0f, 0.018f, 0f);
             uvs[topCapIndex] = new Vector2(0.5f, 0f);
 
             var bottomCapIndex = vertices.Length - 1;
@@ -473,22 +471,21 @@ namespace WorldFarm.Runtime
         private static float CarrotRadius(float t)
         {
             float radius;
-            if (t < 0.18f)
+            if (t < 0.26f)
             {
-                radius = Mathf.Lerp(0.42f, 0.84f, Mathf.SmoothStep(0f, 1f, t / 0.18f));
+                radius = Mathf.Lerp(0.26f, 0.84f, Mathf.SmoothStep(0f, 1f, t / 0.26f));
             }
-            else if (t < 0.50f)
+            else if (t < 0.52f)
             {
-                radius = Mathf.Lerp(0.84f, 0.76f, Mathf.SmoothStep(0f, 1f, (t - 0.18f) / 0.32f));
+                radius = Mathf.Lerp(0.84f, 0.78f, Mathf.SmoothStep(0f, 1f, (t - 0.26f) / 0.26f));
             }
             else
             {
-                var bottomToBelly = Mathf.Clamp01((1f - t) / 0.50f);
-                radius = Mathf.Lerp(0.22f, 0.76f, Mathf.Pow(bottomToBelly, 0.55f));
+                var bottomToBelly = Mathf.Clamp01((1f - t) / 0.48f);
+                radius = Mathf.Lerp(0.22f, 0.78f, Mathf.Pow(bottomToBelly, 0.55f));
             }
 
-            var ridge = 1f + 0.002f * Mathf.Sin(t * 24f);
-            return radius * ridge;
+            return radius;
         }
 
         private void HandlePointerInput()
