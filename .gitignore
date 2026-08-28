@@ -1,7 +1,40 @@
-.gradle/
-build/
-app/build/
-local.properties
-*.iml
-.idea/
+# OS / IDE
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.user
+*.userprefs
+*.suo
+*.tmp
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Unity generated folders
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+
+# Unity generated files
+sysinfo.txt
+*.stackdump
+*.apk
+*.aab
+*.unitypackage
+
+# Crash reports
+crashlytics-build.properties
+
+# Android export output from Unity
+[Ee]xported[Aa]ndroid/
+[Gg]radle[Bb]uild/
