@@ -196,22 +196,54 @@
   "model": {
     "status": "in_review",
     "blenderVersion": "5.2.1 LTS",
-    "sourceFile": "blender/carrot_normal_v001_model.blend",
-    "generatorScript": "blender/create_carrot_model_v001.py",
-    "exportFile": "exports/Crop_Carrot_Normal_v001_model.fbx",
-    "unityResourceModelPath": "UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Crop_Carrot_Normal_v001_model.fbx",
+    "currentReviewRevision": "r02",
+    "sourceFile": "blender/carrot_normal_v001_model_r02.blend",
+    "generatorScript": "blender/create_carrot_model_r02.py",
+    "exportFile": "exports/Crop_Carrot_Normal_v001_model_r02.fbx",
+    "unityResourceModelPath": "UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Crop_Carrot_Normal_v001_model_r02.fbx",
     "screenshots": [
-      "screenshots/v001_model_front.png",
-      "screenshots/v001_model_side.png",
-      "screenshots/v001_model_three_quarter.png",
-      "screenshots/v001_model_top.png"
+      "screenshots/v001_model_r02_front.png",
+      "screenshots/v001_model_r02_side.png",
+      "screenshots/v001_model_r02_three_quarter.png",
+      "screenshots/v001_model_r02_top.png"
     ],
     "reviewNotes": [
       "base silhouette and blockout proportions preserved",
-      "warm orange body material added",
-      "green leaf material variations added",
-      "short non-ring growth marks added",
+      "r01_user_feedback_body_too_plastic_and_no_carrot_texture",
+      "r01_user_feedback_growth_marks_too_few_too_small_and_unnatural",
+      "r01_user_feedback_leaf_material_layers_too_few",
+      "r01_user_feedback_unity_preview_passed",
+      "r01_not_locked",
+      "r02_matte_orange_body_material",
+      "r02_vertical_skin_grain_added",
+      "r02_growth_marks_increased_to_11_and_enlarged",
+      "r02_leaf_material_layers_added",
       "leaf tip ends remain blunt without center bumps"
+    ],
+    "revisionFeedback": [
+      {
+        "date": "2026-08-31",
+        "round": "model_r01",
+        "userFeedback": [
+          "body_material_too_plastic",
+          "no_carrot_skin_texture",
+          "growth_marks_too_few_too_small",
+          "growth_mark_positions_unnatural",
+          "leaf_material_layers_too_few",
+          "unity_preview_passed",
+          "asset_not_locked"
+        ],
+        "changes": [
+          "kept_locked_blockout_shape",
+          "created_model_r02_revision",
+          "body_material_changed_to_matte_orange",
+          "vertical_skin_grain_added",
+          "warm_skin_mottles_added",
+          "growth_marks_increased_and_redistributed",
+          "leaf_primary_secondary_shadow_highlight_material_layers_added",
+          "unity_preview_loader_changed_to_model_r02_first"
+        ]
+      }
     ]
   }
 }

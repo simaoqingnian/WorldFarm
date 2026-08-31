@@ -2,15 +2,35 @@
 
 ## 文件
 
-- Blender 源文件：`carrot_normal_v001_model.blend`
-- 生成脚本：`create_carrot_model_v001.py`
-- FBX 导出：`../exports/Crop_Carrot_Normal_v001_model.fbx`
-- Unity 预览资源：`../../../UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Crop_Carrot_Normal_v001_model.fbx`
+- 当前验收版本：`r02`
+- Blender 源文件：`carrot_normal_v001_model_r02.blend`
+- 生成脚本：`create_carrot_model_r02.py`
+- FBX 导出：`../exports/Crop_Carrot_Normal_v001_model_r02.fbx`
+- Unity 预览资源：`../../../UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Crop_Carrot_Normal_v001_model_r02.fbx`
 - 截图：
-  - `../screenshots/v001_model_front.png`
-  - `../screenshots/v001_model_side.png`
-  - `../screenshots/v001_model_three_quarter.png`
-  - `../screenshots/v001_model_top.png`
+  - `../screenshots/v001_model_r02_front.png`
+  - `../screenshots/v001_model_r02_side.png`
+  - `../screenshots/v001_model_r02_three_quarter.png`
+  - `../screenshots/v001_model_r02_top.png`
+
+## 上一版反馈
+
+`r01` 没有锁定。
+
+用户反馈：
+
+- 主体材质太塑料，没有胡萝卜纹理。
+- 生长痕太少、太小、位置不自然。
+- 叶茎材质层次太少。
+- Unity 预览通过。
+
+`r02` 修订：
+
+- 主体材质改为更哑光的橙色。
+- 新增纵向表皮纹和轻微暖色斑，用于打破纯色塑料感。
+- 生长痕增加到 11 条，尺寸放大，并分布在中下段、肩部和侧面可见区域。
+- 叶茎增加主色、深色、根部色和短高光条。
+- 叶茎高光条不延伸到末端，避免端面再次出现小突起。
 
 ## 已锁定基础体块
 

@@ -8,7 +8,8 @@ namespace WorldFarm.Runtime
     public sealed class AssetPreviewScene : MonoBehaviour
     {
         private const string GeneratedRootName = "GeneratedAssetPreview";
-        private const string ImportedCarrotModelResourcePath = "AssetPreview/Carrot/Crop_Carrot_Normal_v001_model";
+        private const string ImportedCarrotModelResourcePath = "AssetPreview/Carrot/Crop_Carrot_Normal_v001_model_r02";
+        private const string ImportedCarrotPreviousModelResourcePath = "AssetPreview/Carrot/Crop_Carrot_Normal_v001_model";
         private const string ImportedCarrotBlockoutResourcePath = "AssetPreview/Carrot/Crop_Carrot_Normal_v001_blockout";
         private const float CarrotTopY = 0.98f;
         private const float CarrotHeight = 2.72f;
@@ -46,11 +47,13 @@ namespace WorldFarm.Runtime
             public readonly Material Ridge = CreateMaterial("Field Ridge", new Color(0.33f, 0.22f, 0.13f), 0.14f);
             public readonly Material Grass = CreateMaterial("Warm Grass Edge", new Color(0.32f, 0.56f, 0.25f), 0.25f);
             public readonly Material Water = CreateMaterial("Soft Paddy Water", new Color(0.42f, 0.68f, 0.76f), 0.55f);
-            public readonly Material CarrotBody = CreateMaterial("Carrot Body", new Color(0.93f, 0.36f, 0.08f), 0.32f);
-            public readonly Material CarrotRidge = CreateMaterial("Carrot Soft Growth Lines", new Color(0.70f, 0.25f, 0.06f), 0.24f);
-            public readonly Material Leaf = CreateMaterial("Crop Leaf", new Color(0.18f, 0.55f, 0.22f), 0.36f, true);
-            public readonly Material LeafDark = CreateMaterial("Deep Crop Leaf", new Color(0.07f, 0.34f, 0.16f), 0.32f, true);
-            public readonly Material LeafLight = CreateMaterial("Fresh Leaf Highlight", new Color(0.48f, 0.72f, 0.34f), 0.38f, true);
+            public readonly Material CarrotBody = CreateMaterial("Carrot Matte Body", new Color(0.91f, 0.34f, 0.07f), 0.08f);
+            public readonly Material CarrotRidge = CreateMaterial("Carrot Growth Scars", new Color(0.50f, 0.14f, 0.03f), 0.04f);
+            public readonly Material CarrotSkinGrain = CreateMaterial("Carrot Skin Grain", new Color(0.64f, 0.19f, 0.05f), 0.03f);
+            public readonly Material CarrotSkinWarm = CreateMaterial("Carrot Warm Skin Mottle", new Color(0.98f, 0.46f, 0.13f), 0.04f);
+            public readonly Material Leaf = CreateMaterial("Crop Leaf", new Color(0.15f, 0.49f, 0.21f), 0.16f, true);
+            public readonly Material LeafDark = CreateMaterial("Deep Crop Leaf", new Color(0.05f, 0.27f, 0.13f), 0.10f, true);
+            public readonly Material LeafLight = CreateMaterial("Fresh Leaf Highlight", new Color(0.37f, 0.68f, 0.27f), 0.14f, true);
             public readonly Material CabbageOuter = CreateMaterial("Cabbage Outer Leaf", new Color(0.33f, 0.61f, 0.28f), 0.34f, true);
             public readonly Material CabbageInner = CreateMaterial("Cabbage Inner Leaf", new Color(0.70f, 0.82f, 0.48f), 0.38f, true);
             public readonly Material RiceStem = CreateMaterial("Rice Stem", new Color(0.51f, 0.62f, 0.22f), 0.28f);
@@ -142,7 +145,8 @@ namespace WorldFarm.Runtime
             AddStage(root, materials);
 
             var carrotPivot = CreatePreviewSlot(root, "Slot_Carrot", new Vector3(-1.48f, 0f, 1.18f), 0.52f, materials.Platform, materials.PlatformDark);
-            if (!BuildImportedCarrot(ImportedCarrotModelResourcePath, "Asset_Carrot_Normal_v001_Model", carrotPivot, materials, 1.34f) &&
+            if (!BuildImportedCarrot(ImportedCarrotModelResourcePath, "Asset_Carrot_Normal_v001_Model_r02", carrotPivot, materials, 1.34f) &&
+                !BuildImportedCarrot(ImportedCarrotPreviousModelResourcePath, "Asset_Carrot_Normal_v001_Model", carrotPivot, materials, 1.34f) &&
                 !BuildImportedCarrot(ImportedCarrotBlockoutResourcePath, "Asset_Carrot_Normal_v001_Blockout", carrotPivot, materials, 1.34f))
             {
                 BuildCarrot(carrotPivot, materials, 0.31f);
@@ -244,7 +248,25 @@ namespace WorldFarm.Runtime
             foreach (var renderer in renderers)
             {
                 var objectName = renderer.gameObject.name.ToLowerInvariant();
-                if (objectName.Contains("growthmark") || objectName.Contains("growth"))
+                if (objectName.Contains("leafstemhighlight"))
+                {
+                    renderer.sharedMaterial = materials.LeafLight;
+                }
+                else if (objectName.Contains("root") ||
+                         objectName.Contains("secondary") ||
+                         objectName.Contains("shadow"))
+                {
+                    renderer.sharedMaterial = materials.LeafDark;
+                }
+                else if (objectName.Contains("warmpatch") || objectName.Contains("mottle"))
+                {
+                    renderer.sharedMaterial = materials.CarrotSkinWarm;
+                }
+                else if (objectName.Contains("skingrain"))
+                {
+                    renderer.sharedMaterial = materials.CarrotSkinGrain;
+                }
+                else if (objectName.Contains("growthmark") || objectName.Contains("growth"))
                 {
                     renderer.sharedMaterial = materials.CarrotRidge;
                 }
