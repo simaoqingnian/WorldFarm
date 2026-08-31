@@ -1,5 +1,4 @@
 import math
-import os
 from pathlib import Path
 
 import bpy
@@ -143,24 +142,90 @@ def create_carrot_body(material):
     return body
 
 
-def create_bezier_stem(name, points, radius, material):
-    curve = bpy.data.curves.new(name, "CURVE")
-    curve.dimensions = "3D"
-    curve.resolution_u = 18
-    curve.bevel_depth = radius
-    curve.bevel_resolution = 5
-    curve.use_fill_caps = True
+def bezier_point(points, t):
+    vectors = [Vector(point) for point in points]
+    while len(vectors) > 1:
+        vectors = [vectors[index].lerp(vectors[index + 1], t) for index in range(len(vectors) - 1)]
+    return vectors[0]
 
-    spline = curve.splines.new("BEZIER")
-    spline.bezier_points.add(len(points) - 1)
-    for point, coordinate in zip(spline.bezier_points, points):
-        point.co = Vector(coordinate)
-        point.handle_left_type = "AUTO"
-        point.handle_right_type = "AUTO"
 
-    obj = bpy.data.objects.new(name, curve)
+def bezier_tangent(points, t):
+    delta = 0.001
+    t0 = max(0.0, t - delta)
+    t1 = min(1.0, t + delta)
+    tangent = bezier_point(points, t1) - bezier_point(points, t0)
+    if tangent.length == 0.0:
+        return Vector((0.0, 0.0, 1.0))
+    return tangent.normalized()
+
+
+def stem_frame(tangent):
+    return Vector((1.0, 0.0, 0.0)), Vector((0.0, 1.0, 0.0))
+
+
+def stem_radius_scale(t):
+    if t < 0.14:
+        return lerp(0.72, 1.0, smoothstep(t / 0.14))
+    if t < 0.82:
+        return 1.0
+
+    end_t = smoothstep((t - 0.82) / 0.18)
+    return max(0.08, math.cos(end_t * math.pi * 0.5))
+
+
+def create_tapered_stem(name, points, radius, material):
+    radial_segments = 18
+    ring_count = 30
+    vertices = []
+    faces = []
+
+    for ring_index in range(ring_count):
+        # The stem narrows into its own integrated dome instead of using
+        # separate ball-shaped caps or a flat cut.
+        t = (ring_index / (ring_count - 1)) * 0.992
+        center = bezier_point(points, t)
+        tangent = bezier_tangent(points, t)
+        normal, binormal = stem_frame(tangent)
+        ring_radius = radius * stem_radius_scale(t)
+
+        for radial_index in range(radial_segments):
+            angle = 2.0 * math.pi * radial_index / radial_segments
+            offset = normal * math.cos(angle) * ring_radius + binormal * math.sin(angle) * ring_radius
+            vertices.append(tuple(center + offset))
+
+    for ring_index in range(ring_count - 1):
+        row = ring_index * radial_segments
+        next_row = (ring_index + 1) * radial_segments
+        for radial_index in range(radial_segments):
+            next_radial = (radial_index + 1) % radial_segments
+            faces.append((
+                row + radial_index,
+                row + next_radial,
+                next_row + next_radial,
+                next_row + radial_index,
+            ))
+
+    faces.append(tuple(reversed(range(radial_segments))))
+
+    tip_center_index = len(vertices)
+    vertices.append(tuple(bezier_point(points, 1.0)))
+
+    last_row = (ring_count - 1) * radial_segments
+    for radial_index in range(radial_segments):
+        next_radial = (radial_index + 1) % radial_segments
+        faces.append((tip_center_index, last_row + radial_index, last_row + next_radial))
+
+    mesh = bpy.data.meshes.new(f"Mesh_{name}")
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+
+    obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
     obj.data.materials.append(material)
+    bpy.context.view_layer.objects.active = obj
+    obj.select_set(True)
+    bpy.ops.object.shade_smooth()
+    obj.select_set(False)
     return obj
 
 
@@ -179,7 +244,7 @@ def add_uv_sphere(name, location, scale, material, segments=16, rings=8):
     return obj
 
 
-def create_leaf_stems(primary_material, highlight_material):
+def create_leaf_stems(primary_material):
     stem_base_z = BODY_HEIGHT * PROFILE_MAX_T - 0.018
     stem_root_z = stem_base_z - 0.055
 
@@ -201,27 +266,9 @@ def create_leaf_stems(primary_material, highlight_material):
 
     created = []
     for name, points, radius in stems:
-        created.append(create_bezier_stem(name, points, radius, primary_material))
-        tip = Vector(points[-1])
-        add_uv_sphere(f"{name}_RoundedTip", tip, (radius * 1.18, radius * 1.18, radius * 1.18), primary_material, 16, 8)
+        created.append(create_tapered_stem(name, points, radius, primary_material))
 
     return created
-
-
-def convert_curves_to_mesh():
-    bpy.ops.object.select_all(action="DESELECT")
-    curve_objects = [obj for obj in bpy.context.scene.objects if obj.type == "CURVE"]
-    if not curve_objects:
-        return
-
-    for obj in curve_objects:
-        obj.select_set(True)
-    bpy.context.view_layer.objects.active = curve_objects[0]
-    bpy.ops.object.convert(target="MESH")
-
-    for obj in bpy.context.selected_objects:
-        bpy.context.view_layer.objects.active = obj
-        bpy.ops.object.shade_smooth()
 
 
 def create_lights():
@@ -299,11 +346,9 @@ def main():
 
     body_material = make_material("Mat_Blockout_Carrot_Body_ReviewOnly", (0.93, 0.40, 0.10, 1.0), 0.8)
     leaf_material = make_material("Mat_Blockout_Cartoon_LeafStems_ReviewOnly", (0.16, 0.58, 0.23, 1.0), 0.78)
-    leaf_highlight_material = make_material("Mat_Blockout_LeafStem_Tips_ReviewOnly", (0.47, 0.78, 0.34, 1.0), 0.75)
 
     create_carrot_body(body_material)
-    create_leaf_stems(leaf_material, leaf_highlight_material)
-    convert_curves_to_mesh()
+    create_leaf_stems(leaf_material)
     configure_scene()
 
     render_view("v001_blockout_front.png", (0.0, -6.0, 1.62), (0.0, 0.0, 1.55))
