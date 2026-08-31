@@ -1,0 +1,68 @@
+{
+  "assetId": "Crop_Carrot_Normal_v001",
+  "stage": "reference_silhouette",
+  "confirmedDecisions": {
+    "overallProportion": "short_fat_height_to_width_2_2",
+    "topTreatment": "visible_orange_top_with_center_leaf_cluster",
+    "bodyAxis": "straight_symmetric",
+    "surfaceRegularity": "very_slight_natural_asymmetry_later_no_horizontal_rings",
+    "scope": "single_mature_carrot_only"
+  },
+  "dimensions": {
+    "heightToMaxWidth": 2.2,
+    "frontMaxRadius": 1.0,
+    "sideDepthScale": 0.88,
+    "axisBend": 0.0
+  },
+  "profilePoints": [
+    {
+      "id": "P0",
+      "name": "bottom_blunt_tip",
+      "heightPercent": 0,
+      "radiusPercent": 28,
+      "status": "proposed"
+    },
+    {
+      "id": "P1",
+      "name": "lower_body_swell",
+      "heightPercent": 18,
+      "radiusPercent": 58,
+      "status": "proposed"
+    },
+    {
+      "id": "P2",
+      "name": "maximum_belly",
+      "heightPercent": 42,
+      "radiusPercent": 100,
+      "status": "proposed"
+    },
+    {
+      "id": "P3",
+      "name": "upper_shoulder",
+      "heightPercent": 68,
+      "radiusPercent": 82,
+      "status": "proposed"
+    },
+    {
+      "id": "P4",
+      "name": "visible_orange_crown",
+      "heightPercent": 90,
+      "radiusPercent": 46,
+      "status": "proposed"
+    },
+    {
+      "id": "P5",
+      "name": "leaf_cluster_socket",
+      "heightPercent": 100,
+      "radiusPercent": 28,
+      "status": "proposed"
+    }
+  ],
+  "rules": [
+    "P0_to_P2_must_be_convex",
+    "P2_to_P5_must_taper_continuously",
+    "visible_orange_top_must_not_form_bowl_or_platform",
+    "no_horizontal_belly_ring",
+    "bottom_blunt_tip_direction_preserved"
+  ]
+}
