@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
   <rect width="1200" height="720" fill="#f7f4ee"/>
-  <text x="60" y="54" font-family="Arial, sans-serif" font-size="28" fill="#222">WorldFarm - Crop_Carrot_Normal_v001 silhouette reference r02</text>
-  <text x="60" y="86" font-family="Arial, sans-serif" font-size="16" fill="#555">Stage 2: smooth inverted cone, visible orange top, upright leaves. Ignore texture, material, leaf veins and surface marks.</text>
+  <text x="60" y="54" font-family="Arial, sans-serif" font-size="28" fill="#222">WorldFarm - Crop_Carrot_Normal_v001 silhouette reference r03</text>
+  <text x="60" y="86" font-family="Arial, sans-serif" font-size="16" fill="#555">Stage 2: approved orange body, larger upright-spreading leaves, narrower rounded bottom. Ignore texture and material.</text>
 
   <g transform="translate(0,0)">
     <text x="250" y="138" font-family="Arial, sans-serif" font-size="22" fill="#222">Front</text>
@@ -11,9 +11,9 @@
              C 214 264, 220 294, 228 321
              C 234 365, 241 403, 248 435
              C 256 480, 264 518, 268 541
-             C 270 573, 274 600, 276 620
-             C 278 638, 342 638, 344 620
-             C 346 600, 350 573, 352 541
+             C 272 574, 278 604, 284 621
+             C 289 646, 331 646, 336 621
+             C 342 604, 348 574, 352 541
              C 356 518, 364 480, 372 435
              C 379 403, 386 365, 392 321
              C 400 294, 406 264, 410 224
@@ -21,16 +21,25 @@
              C 348 166, 272 166, 238 180 Z"
           fill="#ed7a24" stroke="#2c2c2c" stroke-width="4" stroke-linejoin="round"/>
     <g fill="#2f8f3f" stroke="#1d5c2c" stroke-width="3" stroke-linejoin="round">
-      <path d="M 310 166 C 294 132, 300 90, 322 58 C 350 100, 342 140, 310 166 Z"/>
-      <path d="M 306 168 C 282 138, 270 98, 276 70 C 312 96, 326 134, 306 168 Z"/>
-      <path d="M 314 168 C 332 136, 358 98, 390 78 C 396 116, 366 152, 314 168 Z"/>
-      <path d="M 308 170 C 292 148, 286 120, 292 98 C 318 118, 324 148, 308 170 Z"/>
-      <path d="M 312 170 C 326 148, 342 126, 364 112 C 366 140, 344 160, 312 170 Z"/>
+      <path d="M 310 166 C 298 128, 302 82, 318 38 C 354 84, 350 132, 310 166 Z"/>
+      <path d="M 310 168 C 290 134, 276 86, 284 48 C 326 76, 338 126, 310 168 Z"/>
+      <path d="M 310 168 C 334 132, 366 86, 408 58 C 414 108, 372 150, 310 168 Z"/>
+      <path d="M 309 170 C 292 144, 252 108, 220 98 C 232 144, 268 168, 309 170 Z"/>
+      <path d="M 311 170 C 336 144, 380 122, 426 120 C 406 160, 360 178, 311 170 Z"/>
+      <path d="M 310 168 C 302 138, 308 104, 330 78 C 350 112, 342 146, 310 168 Z"/>
+      <path d="M 310 170 C 320 142, 340 114, 370 98 C 376 132, 350 158, 310 170 Z"/>
     </g>
-    <ellipse cx="310" cy="170" rx="20" ry="7" fill="#1d5c2c" opacity="0.80"/>
+    <g stroke="#1d5c2c" stroke-width="4" stroke-linecap="round">
+      <path d="M 310 172 C 310 154, 311 138, 318 120" fill="none"/>
+      <path d="M 310 172 C 306 154, 298 134, 286 114" fill="none"/>
+      <path d="M 310 172 C 318 154, 338 134, 360 118" fill="none"/>
+      <path d="M 310 172 C 302 154, 274 136, 246 124" fill="none"/>
+      <path d="M 310 172 C 324 154, 360 140, 396 136" fill="none"/>
+    </g>
+    <ellipse cx="310" cy="170" rx="18" ry="8" fill="#1d5c2c" opacity="0.85"/>
 
     <g font-family="Arial, sans-serif" font-size="14" fill="#333">
-      <circle cx="276" cy="620" r="5" fill="#222"/><text x="100" y="624">P0 bottom blunt 34%</text>
+      <circle cx="284" cy="620" r="5" fill="#222"/><text x="100" y="624">P0 bottom blunt 26%</text>
       <circle cx="268" cy="541" r="5" fill="#222"/><text x="106" y="545">P1 lower transition 42%</text>
       <circle cx="248" cy="435" r="5" fill="#222"/><text x="112" y="439">P2 middle transition 62%</text>
       <circle cx="228" cy="321" r="5" fill="#222"/><text x="104" y="325">P3 upper transition 82%</text>
@@ -47,9 +56,9 @@
              C 746 264, 751 294, 758 321
              C 763 365, 770 403, 776 435
              C 783 480, 790 518, 793 541
-             C 795 573, 799 600, 800 620
-             C 802 636, 858 636, 860 620
-             C 861 600, 865 573, 867 541
+             C 797 574, 803 604, 807 621
+             C 812 642, 848 642, 853 621
+             C 857 604, 863 574, 867 541
              C 870 518, 877 480, 884 435
              C 890 403, 897 365, 902 321
              C 909 294, 914 264, 918 224
@@ -57,24 +66,33 @@
              C 862 168, 798 168, 767 180 Z"
           fill="#ed7a24" stroke="#2c2c2c" stroke-width="4" stroke-linejoin="round"/>
     <g fill="#2f8f3f" stroke="#1d5c2c" stroke-width="3" stroke-linejoin="round">
-      <path d="M 830 166 C 814 132, 820 90, 842 58 C 870 100, 862 140, 830 166 Z"/>
-      <path d="M 826 168 C 802 138, 790 98, 796 70 C 832 96, 846 134, 826 168 Z"/>
-      <path d="M 834 168 C 852 136, 878 98, 910 78 C 916 116, 886 152, 834 168 Z"/>
-      <path d="M 828 170 C 812 148, 806 120, 812 98 C 838 118, 844 148, 828 170 Z"/>
+      <path d="M 830 166 C 818 128, 822 82, 838 38 C 874 84, 870 132, 830 166 Z"/>
+      <path d="M 830 168 C 810 134, 796 86, 804 48 C 846 76, 858 126, 830 168 Z"/>
+      <path d="M 830 168 C 854 132, 886 86, 928 58 C 934 108, 892 150, 830 168 Z"/>
+      <path d="M 829 170 C 812 144, 772 108, 740 98 C 752 144, 788 168, 829 170 Z"/>
+      <path d="M 831 170 C 856 144, 900 122, 946 120 C 926 160, 880 178, 831 170 Z"/>
+      <path d="M 830 168 C 822 138, 828 104, 850 78 C 870 112, 862 146, 830 168 Z"/>
     </g>
-    <ellipse cx="830" cy="170" rx="18" ry="6" fill="#1d5c2c" opacity="0.80"/>
+    <g stroke="#1d5c2c" stroke-width="4" stroke-linecap="round">
+      <path d="M 830 172 C 830 154, 831 138, 838 120" fill="none"/>
+      <path d="M 830 172 C 826 154, 818 134, 806 114" fill="none"/>
+      <path d="M 830 172 C 838 154, 858 134, 880 118" fill="none"/>
+      <path d="M 830 172 C 822 154, 794 136, 766 124" fill="none"/>
+      <path d="M 830 172 C 844 154, 880 140, 916 136" fill="none"/>
+    </g>
+    <ellipse cx="830" cy="170" rx="16" ry="7" fill="#1d5c2c" opacity="0.85"/>
     <g font-family="Arial, sans-serif" font-size="14" fill="#333">
       <text x="960" y="400">Side depth = 88% of front width</text>
       <text x="960" y="424">Axis: straight and symmetric</text>
       <text x="960" y="448">P4 is the widest point</text>
       <text x="960" y="472">P0/P1: no shrink waist</text>
-      <text x="960" y="496">Leaves grow upright from top</text>
-      <text x="960" y="520">No horizontal belly ring</text>
+      <text x="960" y="496">Leaves rise first, then spread</text>
+      <text x="960" y="520">Narrower rounded bottom</text>
     </g>
   </g>
 
   <g font-family="Arial, sans-serif" font-size="15" fill="#333">
     <rect x="60" y="646" width="1080" height="44" rx="6" fill="#ffffff" stroke="#d7d0c5"/>
-    <text x="78" y="674">Review focus: smooth inverted cone, P4 widest, wider visible top, upright leaves, no P0/P1 waist, no belly ring. Do not review texture/material yet.</text>
+    <text x="78" y="674">Review focus: approved body retained, bigger upright-spreading leaves, narrower rounded bottom, no P0/P1 waist. Do not review texture/material yet.</text>
   </g>
 </svg>

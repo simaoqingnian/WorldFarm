@@ -19,7 +19,7 @@
       "id": "P0",
       "name": "bottom_blunt_tip",
       "heightPercent": 0,
-      "radiusPercent": 34,
+      "radiusPercent": 26,
       "status": "proposed"
     },
     {
@@ -68,5 +68,16 @@
     "leaves_must_grow_upright_from_top_center_not_cover_top",
     "no_horizontal_belly_ring",
     "bottom_blunt_tip_direction_preserved"
-  ]
+  ],
+  "stage2Review": {
+    "passed": [
+      "visible_orange_top_body_shape",
+      "smooth_inverted_cone_body",
+      "P4_widest_point"
+    ],
+    "revisionRequested": [
+      "larger_upright_then_spreading_leaf_cluster",
+      "narrower_rounder_bottom_no_flat_edge"
+    ]
+  }
 }
