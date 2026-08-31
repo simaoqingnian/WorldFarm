@@ -166,11 +166,7 @@ def stem_frame(tangent):
 def stem_radius_scale(t):
     if t < 0.14:
         return lerp(0.72, 1.0, smoothstep(t / 0.14))
-    if t < 0.82:
-        return 1.0
-
-    end_t = smoothstep((t - 0.82) / 0.18)
-    return max(0.08, math.cos(end_t * math.pi * 0.5))
+    return 1.0
 
 
 def create_tapered_stem(name, points, radius, material):
@@ -180,9 +176,9 @@ def create_tapered_stem(name, points, radius, material):
     faces = []
 
     for ring_index in range(ring_count):
-        # The stem narrows into its own integrated dome instead of using
-        # separate ball-shaped caps or a flat cut.
-        t = (ring_index / (ring_count - 1)) * 0.992
+        # The stem ends with a plain blunt face. Avoid separate ball caps,
+        # tapered nipples, and single-point tips.
+        t = ring_index / (ring_count - 1)
         center = bezier_point(points, t)
         tangent = bezier_tangent(points, t)
         normal, binormal = stem_frame(tangent)
@@ -207,13 +203,8 @@ def create_tapered_stem(name, points, radius, material):
 
     faces.append(tuple(reversed(range(radial_segments))))
 
-    tip_center_index = len(vertices)
-    vertices.append(tuple(bezier_point(points, 1.0)))
-
     last_row = (ring_count - 1) * radial_segments
-    for radial_index in range(radial_segments):
-        next_radial = (radial_index + 1) % radial_segments
-        faces.append((tip_center_index, last_row + radial_index, last_row + next_radial))
+    faces.append(tuple(last_row + radial_index for radial_index in range(radial_segments)))
 
     mesh = bpy.data.meshes.new(f"Mesh_{name}")
     mesh.from_pydata(vertices, [], faces)

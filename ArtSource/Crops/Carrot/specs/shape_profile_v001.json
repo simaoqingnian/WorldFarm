@@ -67,7 +67,7 @@
     "visible_orange_top_must_not_form_bowl_or_platform",
     "leaves_must_grow_upright_from_top_center_not_cover_top",
     "leaf_cluster_must_use_4_chunky_cartoon_rounded_stems_not_flat_leaves",
-    "leaf_stem_tips_must_be_integrated_tapered_domes_not_separate_ball_caps",
+    "leaf_stem_tips_must_be_integrated_blunt_ends_without_ball_caps_single_point_tips_or_center_bumps",
     "no_horizontal_belly_ring",
     "bottom_blunt_tip_direction_preserved"
   ],
@@ -106,7 +106,9 @@
       "revision_2026_08_31_leaf_cluster_changed_to_4_chunky_stems",
       "revision_2026_08_31_small_rounded_root_knot_added_for_stem_connection",
       "revision_2026_08_31_leaf_tip_ball_caps_removed",
-      "revision_2026_08_31_leaf_tips_changed_to_integrated_tapered_domes"
+      "revision_2026_08_31_leaf_tips_changed_to_integrated_tapered_domes",
+      "revision_2026_08_31_leaf_tip_tapered_domes_replaced_by_plain_blunt_ends",
+      "revision_2026_08_31_leaf_tip_single_point_closure_removed"
     ],
     "revisionFeedback": [
       {
@@ -140,6 +142,20 @@
           "separate_leaf_tip_spheres_removed",
           "leaf_stems_changed_to_mesh_generated_integrated_tapered_domes",
           "leaf_tip_ends_do_not_expand_beyond_stem_radius"
+        ]
+      },
+      {
+        "date": "2026-08-31",
+        "round": "blockout_03",
+        "userFeedback": [
+          "leaf_cluster_tip_ends_have_small_bumps",
+          "remove_tip_bumps"
+        ],
+        "changes": [
+          "body_top_bottom_side_preserved_as_passed",
+          "single_point_leaf_tip_closure_removed",
+          "leaf_tip_tapering_removed",
+          "leaf_tip_ends_changed_to_plain_blunt_faces_without_center_bumps"
         ]
       }
     ]
