@@ -1,6 +1,6 @@
 {
   "assetId": "Crop_Carrot_Normal_v001",
-  "stage": "reference_silhouette",
+  "stage": "blender_blockout_review",
   "confirmedDecisions": {
     "overallProportion": "short_fat_height_to_width_2_2",
     "topTreatment": "visible_orange_top_with_center_leaf_cluster",
@@ -27,35 +27,35 @@
       "name": "lower_body_transition",
       "heightPercent": 18,
       "radiusPercent": 42,
-      "status": "proposed"
+      "status": "locked"
     },
     {
       "id": "P2",
       "name": "middle_transition",
       "heightPercent": 42,
       "radiusPercent": 62,
-      "status": "proposed"
+      "status": "locked"
     },
     {
       "id": "P3",
       "name": "upper_body_transition",
       "heightPercent": 68,
       "radiusPercent": 82,
-      "status": "proposed"
+      "status": "locked"
     },
     {
       "id": "P4",
       "name": "widest_upper_shoulder",
       "heightPercent": 90,
       "radiusPercent": 100,
-      "status": "proposed"
+      "status": "locked"
     },
     {
       "id": "P5",
       "name": "upright_leaf_socket",
       "heightPercent": 100,
       "radiusPercent": 72,
-      "status": "proposed"
+      "status": "locked"
     }
   ],
   "rules": [
@@ -75,10 +75,30 @@
       "visible_orange_top_body_shape",
       "smooth_inverted_cone_body",
       "P4_widest_point",
-      "bottom_blunt_tip"
-    ],
-    "revisionRequested": [
+      "bottom_blunt_tip",
       "cartoon_upright_leaf_stems_no_flat_leaves"
+    ],
+    "revisionRequested": [],
+    "completed": true,
+    "completedDate": "2026-08-31"
+  },
+  "blockout": {
+    "status": "in_review",
+    "blenderVersion": "5.2.1 LTS",
+    "sourceFile": "blender/carrot_normal_v001_blockout.blend",
+    "generatorScript": "blender/create_carrot_blockout_v001.py",
+    "exportFile": "exports/Crop_Carrot_Normal_v001_blockout.fbx",
+    "screenshots": [
+      "screenshots/v001_blockout_front.png",
+      "screenshots/v001_blockout_side.png",
+      "screenshots/v001_blockout_three_quarter.png",
+      "screenshots/v001_blockout_top.png"
+    ],
+    "reviewNotes": [
+      "temporary flat colors separate body and leaf stems",
+      "not final material",
+      "leaf stems grow directly from orange top center",
+      "top uses rounded cap rings to avoid a flat platform"
     ]
   }
 }

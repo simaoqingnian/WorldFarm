@@ -41,3 +41,8 @@ crashlytics-build.properties
 
 # Local setup logs
 tools/install-logs/
+
+# Blender local backup files
+*.blend1
+*.blend2
+*.blend3

@@ -10,8 +10,8 @@
 | 归属模板 | `RootCropTemplate` |
 | 使用阶段 | 正式灰模起点 |
 | 目标引擎 | Tuanjie / Unity Android |
-| 建模源文件 | `blender/carrot_normal_v001.blend` |
-| 导出目标 | `exports/Crop_Carrot_Normal_v001.fbx` |
+| 建模源文件 | `blender/carrot_normal_v001_blockout.blend` |
+| 导出目标 | `exports/Crop_Carrot_Normal_v001_blockout.fbx` |
 
 ## 当前决策
 
@@ -29,6 +29,7 @@
 - 顶部处理：橙色主体明显可见，叶子从中间长出，但橙色顶部不能形成平面、平台或碗沿。
 - 主体趋势：整体接近平滑倒圆锥，最宽点在 P4 附近，不在 P2。
 - 底部趋势：P0/P1 之间不做收缩曲线或腰线。
+- 叶簇方向：几根卡通圆润直立叶茎，从中心长出，不使用扁平叶片。
 - 主体轴线：正面和侧面主体保持笔直对称。
 - 表面规则度：允许极轻微自然不对称，但不能出现横向环线。
 - 第一版范围：只做成熟单根胡萝卜。
@@ -48,9 +49,9 @@
 | 阶段 | 目标 | 状态 |
 | --- | --- | --- |
 | 1. 需求卡 | 明确资产目标和禁止方向 | `completed` |
-| 2. 参考图 | 生成或收集正面/侧面参考 | `in_progress` |
-| 3. 轮廓草图 | 确认黑白剪影和控制点 | `pending` |
-| 4. Blender 灰模 | 创建可旋转三维灰模 | `pending` |
+| 2. 参考图 | 生成或收集正面/侧面参考 | `completed` |
+| 3. 轮廓草图 | 确认黑白剪影和控制点 | `completed` |
+| 4. Blender 灰模 | 创建可旋转三维灰模 | `in_review` |
 | 5. Unity 预览 | 导入 prefab 并放入预览场景 | `pending` |
 | 6. Android 实机 | 构建 APK，手机查看比例和识别度 | `pending` |
 | 7. 锁定 | 记录通过版本，不再随意改大形 | `pending` |

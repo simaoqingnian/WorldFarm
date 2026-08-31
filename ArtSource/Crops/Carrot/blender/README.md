@@ -6,6 +6,8 @@
 
 - `carrot_normal_v001_blockout.blend`
 - `carrot_normal_v001_model.blend`
+- `create_carrot_blockout_v001.py`
+- `blockout_review.md`
 
 阶段说明：
 
@@ -14,4 +16,4 @@
 
 导出到：
 
-- `../exports/Crop_Carrot_Normal_v001.fbx`
+- `../exports/Crop_Carrot_Normal_v001_blockout.fbx`

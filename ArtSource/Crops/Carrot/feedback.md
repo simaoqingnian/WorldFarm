@@ -20,7 +20,7 @@
 
 ## v001 正式流程
 
-状态：`reference_in_progress`
+状态：`blockout_in_review`
 
 ### 阶段 1 需求卡确认
 
@@ -100,3 +100,41 @@
 - 叶簇从扁平叶片改为几根卡通粗圆头叶茎。
 - 叶茎从顶部中心出发，先直立向上，再轻微向四周扩散。
 - 阶段 2 当前只剩叶簇需要确认。
+
+### 阶段 2 完成
+
+日期：2026-08-31
+
+用户反馈：
+
+- 叶簇通过，进入灰模。
+
+结果：
+
+- 阶段 2 参考图和轮廓控制点完成。
+- 底部、主体、顶部橙色主体、P4 最宽点和卡通直立叶茎全部按阶段 2 锁定。
+
+### 阶段 4 Blender 灰模生成
+
+日期：2026-08-31
+
+环境：
+
+- Blender: `5.2.1 LTS`
+- Blender 路径：`F:/01_program_files/Blender/blender.exe`
+
+输出：
+
+- 源文件：`blender/carrot_normal_v001_blockout.blend`
+- 生成脚本：`blender/create_carrot_blockout_v001.py`
+- 导出文件：`exports/Crop_Carrot_Normal_v001_blockout.fbx`
+- 截图：`screenshots/v001_blockout_front.png`
+- 截图：`screenshots/v001_blockout_side.png`
+- 截图：`screenshots/v001_blockout_three_quarter.png`
+- 截图：`screenshots/v001_blockout_top.png`
+
+说明：
+
+- 灰模使用临时纯色区分主体和叶茎，不作为最终材质。
+- 叶簇在 3D 中不使用绿色盖状基座，叶茎直接从橙色顶部中心长出。
+- 当前等待用户验收 Blender 灰模截图。
