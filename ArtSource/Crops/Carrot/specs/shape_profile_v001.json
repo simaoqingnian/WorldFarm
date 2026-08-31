@@ -19,49 +19,53 @@
       "id": "P0",
       "name": "bottom_blunt_tip",
       "heightPercent": 0,
-      "radiusPercent": 28,
+      "radiusPercent": 34,
       "status": "proposed"
     },
     {
       "id": "P1",
-      "name": "lower_body_swell",
+      "name": "lower_body_transition",
       "heightPercent": 18,
-      "radiusPercent": 58,
+      "radiusPercent": 42,
       "status": "proposed"
     },
     {
       "id": "P2",
-      "name": "maximum_belly",
+      "name": "middle_transition",
       "heightPercent": 42,
-      "radiusPercent": 100,
+      "radiusPercent": 62,
       "status": "proposed"
     },
     {
       "id": "P3",
-      "name": "upper_shoulder",
+      "name": "upper_body_transition",
       "heightPercent": 68,
       "radiusPercent": 82,
       "status": "proposed"
     },
     {
       "id": "P4",
-      "name": "visible_orange_crown",
+      "name": "widest_upper_shoulder",
       "heightPercent": 90,
-      "radiusPercent": 46,
+      "radiusPercent": 100,
       "status": "proposed"
     },
     {
       "id": "P5",
-      "name": "leaf_cluster_socket",
+      "name": "upright_leaf_socket",
       "heightPercent": 100,
-      "radiusPercent": 28,
+      "radiusPercent": 72,
       "status": "proposed"
     }
   ],
   "rules": [
-    "P0_to_P2_must_be_convex",
-    "P2_to_P5_must_taper_continuously",
+    "P0_to_P4_must_widen_monotonically_as_smooth_inverted_cone",
+    "P0_to_P1_must_not_have_concave_waist_or_shrink_curve",
+    "P2_must_not_be_widest_point",
+    "P4_must_be_widest_point",
+    "P4_to_P5_must_round_into_visible_orange_top",
     "visible_orange_top_must_not_form_bowl_or_platform",
+    "leaves_must_grow_upright_from_top_center_not_cover_top",
     "no_horizontal_belly_ring",
     "bottom_blunt_tip_direction_preserved"
   ]
