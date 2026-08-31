@@ -2,6 +2,10 @@
 
 本目录保存正式美术源资产，不保存 Unity 自动生成缓存。
 
+可控建模流程详见：
+
+- `../design/WorldFarm_ControlledModelingWorkflow.md`
+
 ## 目录职责
 
 - `Crops/`: 作物源资产。

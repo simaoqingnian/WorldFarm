@@ -1,6 +1,6 @@
 {
   "assetId": "Crop_Carrot_Normal_v001",
-  "stage": "blender_blockout_review",
+  "stage": "unity_preview",
   "confirmedDecisions": {
     "overallProportion": "short_fat_height_to_width_2_2",
     "topTreatment": "visible_orange_top_with_center_leaf_cluster",
@@ -84,7 +84,7 @@
     "completedDate": "2026-08-31"
   },
   "blockout": {
-    "status": "in_review",
+    "status": "passed",
     "blenderVersion": "5.2.1 LTS",
     "sourceFile": "blender/carrot_normal_v001_blockout.blend",
     "generatorScript": "blender/create_carrot_blockout_v001.py",
@@ -109,6 +109,15 @@
       "revision_2026_08_31_leaf_tips_changed_to_integrated_tapered_domes",
       "revision_2026_08_31_leaf_tip_tapered_domes_replaced_by_plain_blunt_ends",
       "revision_2026_08_31_leaf_tip_single_point_closure_removed"
+    ],
+    "passedDate": "2026-08-31",
+    "passedParts": [
+      "body",
+      "top",
+      "leaf_cluster",
+      "leaf_tip_ends",
+      "bottom",
+      "side_profile"
     ],
     "revisionFeedback": [
       {
@@ -157,7 +166,26 @@
           "leaf_tip_tapering_removed",
           "leaf_tip_ends_changed_to_plain_blunt_faces_without_center_bumps"
         ]
+      },
+      {
+        "date": "2026-08-31",
+        "round": "blockout_pass",
+        "userFeedback": [
+          "leaf_cluster_passed",
+          "enter_preview"
+        ],
+        "changes": [
+          "blockout_status_changed_to_passed",
+          "asset_stage_changed_to_unity_preview"
+        ]
       }
     ]
+  },
+  "unityPreview": {
+    "status": "apk_built",
+    "scene": "UnityProject/Assets/WorldFarm/Scenes/AssetPreview.unity",
+    "resourceModelPath": "UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Crop_Carrot_Normal_v001_blockout.fbx",
+    "androidApkPath": "Builds/Android/WorldFarm-dev.apk",
+    "builtDate": "2026-08-31"
   }
 }

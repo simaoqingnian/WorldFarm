@@ -5,6 +5,7 @@ WorldFarm 是一款准备使用 Unity 开发的农场经营游戏。玩家从中
 ## 当前结构
 
 - `UnityProject/`：Unity 主工程目录
+- `ArtSource/`：正式美术源资产、灰模、导出文件和截图
 - `design/`：游戏设计文档
 - `.gitignore`：Unity 项目忽略规则
 
@@ -14,6 +15,7 @@ WorldFarm 是一款准备使用 Unity 开发的农场经营游戏。玩家从中
 - [地貌与变异设计](design/WorldFarm_BiomeMutationDesign.md)
 - [国家与地貌设计](design/WorldFarm_CountryBiomeDesign.md)
 - [3D 资产开发流程与风格规范](design/WorldFarm_3DAssetPipeline.md)
+- [可控建模流程](design/WorldFarm_ControlledModelingWorkflow.md)
 
 ## Unity 环境
 

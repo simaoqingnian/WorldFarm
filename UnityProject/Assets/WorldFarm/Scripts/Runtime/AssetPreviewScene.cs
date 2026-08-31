@@ -8,6 +8,7 @@ namespace WorldFarm.Runtime
     public sealed class AssetPreviewScene : MonoBehaviour
     {
         private const string GeneratedRootName = "GeneratedAssetPreview";
+        private const string ImportedCarrotBlockoutResourcePath = "AssetPreview/Carrot/Crop_Carrot_Normal_v001_blockout";
         private const float CarrotTopY = 0.98f;
         private const float CarrotHeight = 2.72f;
 
@@ -140,7 +141,11 @@ namespace WorldFarm.Runtime
             AddStage(root, materials);
 
             var carrotPivot = CreatePreviewSlot(root, "Slot_Carrot", new Vector3(-1.48f, 0f, 1.18f), 0.52f, materials.Platform, materials.PlatformDark);
-            BuildCarrot(carrotPivot, materials, 0.31f);
+            if (!BuildImportedCarrotBlockout(carrotPivot, materials, 1.34f))
+            {
+                BuildCarrot(carrotPivot, materials, 0.31f);
+            }
+
             turntables.Add(new PreviewTurntable(carrotPivot, 14f, true));
 
             var cabbagePivot = CreatePreviewSlot(root, "Slot_Cabbage", new Vector3(0f, 0f, 1.34f), 0.58f, materials.Platform, materials.PlatformDark);
@@ -210,6 +215,78 @@ namespace WorldFarm.Runtime
             pivot.SetParent(slot, false);
             pivot.localPosition = new Vector3(0f, 0.07f, 0f);
             return pivot;
+        }
+
+        private static bool BuildImportedCarrotBlockout(Transform parent, PreviewMaterials materials, float targetHeight)
+        {
+            var importedModel = Resources.Load<GameObject>(ImportedCarrotBlockoutResourcePath);
+            if (importedModel == null)
+            {
+                return false;
+            }
+
+            var model = Object.Instantiate(importedModel, parent, false);
+            model.name = "Asset_Carrot_Normal_v001_Blockout";
+            model.transform.localPosition = Vector3.zero;
+            model.transform.localRotation = Quaternion.identity;
+            model.transform.localScale = Vector3.one;
+
+            ApplyImportedCarrotMaterials(model.transform, materials);
+            FitImportedModelToSlot(model.transform, targetHeight);
+            return true;
+        }
+
+        private static void ApplyImportedCarrotMaterials(Transform model, PreviewMaterials materials)
+        {
+            var renderers = model.GetComponentsInChildren<Renderer>(true);
+            foreach (var renderer in renderers)
+            {
+                var objectName = renderer.gameObject.name.ToLowerInvariant();
+                renderer.sharedMaterial = objectName.Contains("body")
+                    ? materials.CarrotBody
+                    : materials.Leaf;
+                renderer.shadowCastingMode = ShadowCastingMode.On;
+                renderer.receiveShadows = true;
+            }
+        }
+
+        private static void FitImportedModelToSlot(Transform model, float targetHeight)
+        {
+            if (!TryGetWorldRenderBounds(model, out var bounds))
+            {
+                return;
+            }
+
+            var height = Mathf.Max(bounds.size.y, 0.001f);
+            var scale = targetHeight / height;
+            model.localScale = Vector3.one * scale;
+
+            if (!TryGetWorldRenderBounds(model, out bounds))
+            {
+                return;
+            }
+
+            var centerLocal = model.parent.InverseTransformPoint(bounds.center);
+            var bottomLocal = model.parent.InverseTransformPoint(new Vector3(bounds.center.x, bounds.min.y, bounds.center.z));
+            model.localPosition += new Vector3(-centerLocal.x, -bottomLocal.y, -centerLocal.z);
+        }
+
+        private static bool TryGetWorldRenderBounds(Transform root, out Bounds bounds)
+        {
+            var renderers = root.GetComponentsInChildren<Renderer>(true);
+            bounds = default;
+            if (renderers.Length == 0)
+            {
+                return false;
+            }
+
+            bounds = renderers[0].bounds;
+            for (var index = 1; index < renderers.Length; index++)
+            {
+                bounds.Encapsulate(renderers[index].bounds);
+            }
+
+            return true;
         }
 
         private static void BuildCarrot(Transform parent, PreviewMaterials materials, float scale)
