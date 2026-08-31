@@ -11,7 +11,7 @@
   "dimensions": {
     "heightToMaxWidth": 2.2,
     "frontMaxRadius": 1.0,
-    "sideDepthScale": 0.88,
+    "sideDepthScale": 1.05,
     "axisBend": 0.0
   },
   "profilePoints": [
@@ -66,7 +66,7 @@
     "P4_to_P5_must_round_into_visible_orange_top",
     "visible_orange_top_must_not_form_bowl_or_platform",
     "leaves_must_grow_upright_from_top_center_not_cover_top",
-    "leaf_cluster_must_use_5_to_7_cartoon_rounded_stems_not_flat_leaves",
+    "leaf_cluster_must_use_4_chunky_cartoon_rounded_stems_not_flat_leaves",
     "no_horizontal_belly_ring",
     "bottom_blunt_tip_direction_preserved"
   ],
@@ -97,8 +97,34 @@
     "reviewNotes": [
       "temporary flat colors separate body and leaf stems",
       "not final material",
-      "leaf stems grow directly from orange top center",
-      "top uses rounded cap rings to avoid a flat platform"
+      "leaf stems grow from the orange top center area",
+      "top uses rounded cap rings to avoid a flat platform",
+      "revision_2026_08_31_body_profile_uses_continuous_hermite_curve",
+      "revision_2026_08_31_body_applies_subdivision_before_export",
+      "revision_2026_08_31_side_depth_scale_changed_to_1_05",
+      "revision_2026_08_31_leaf_cluster_changed_to_4_chunky_stems",
+      "revision_2026_08_31_small_rounded_root_knot_added_for_stem_connection"
+    ],
+    "revisionFeedback": [
+      {
+        "date": "2026-08-31",
+        "round": "blockout_01",
+        "userFeedback": [
+          "body_outline_not_smooth_wave_like",
+          "top_stem_connection_unnatural",
+          "leaf_cluster_too_many_too_thin_not_cartoon_enough",
+          "bottom_passed",
+          "side_too_thin"
+        ],
+        "changes": [
+          "continuous_hermite_body_radius_curve",
+          "subdivision_applied_to_body_before_export",
+          "side_depth_scale_1_05",
+          "four_chunky_cartoon_rounded_leaf_stems",
+          "small_rounded_root_knot_for_top_connection",
+          "bottom_preserved"
+        ]
+      }
     ]
   }
 }

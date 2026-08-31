@@ -14,11 +14,11 @@ BLEND_PATH = SCRIPT_DIR / "carrot_normal_v001_blockout.blend"
 FBX_PATH = EXPORT_DIR / "Crop_Carrot_Normal_v001_blockout.fbx"
 
 BODY_HEIGHT = 2.20
-PROFILE_MAX_T = 1.09
+PROFILE_MAX_T = 1.075
 MAX_RADIUS = 0.50
-SIDE_DEPTH_SCALE = 0.88
-RADIAL_SEGMENTS = 32
-HEIGHT_SEGMENTS = 44
+SIDE_DEPTH_SCALE = 1.05
+RADIAL_SEGMENTS = 56
+HEIGHT_SEGMENTS = 80
 
 
 def ensure_dirs():
@@ -52,30 +52,35 @@ def lerp(a, b, t):
 
 
 def radius_percent_at(height_percent):
-    # Extra underside points make the locked P0 bottom read rounded in 3D,
-    # while the formal control points still define the main silhouette.
-    points = [
-        (0.00, 8.0),
-        (0.025, 21.0),
-        (0.055, 26.0),
-        (0.18, 42.0),
-        (0.42, 62.0),
-        (0.68, 82.0),
-        (0.90, 100.0),
-        (1.00, 72.0),
-        (1.04, 48.0),
-        (1.075, 20.0),
-        (1.09, 8.0),
-    ]
+    # Keep the approved rounded bottom, then use one continuous monotonic curve
+    # up to the widest shoulder. This avoids segmented "wave" changes in profile.
+    if height_percent <= 0.055:
+        t = smoothstep(height_percent / 0.055)
+        return lerp(8.0, 26.0, t)
 
-    for index in range(len(points) - 1):
-        h0, r0 = points[index]
-        h1, r1 = points[index + 1]
-        if h0 <= height_percent <= h1:
-            t = smoothstep((height_percent - h0) / (h1 - h0))
-            return lerp(r0, r1, t)
+    if height_percent <= 0.90:
+        profile_points = [
+            (0.055, 26.0, 140.0),
+            (0.18, 42.0, 105.0),
+            (0.42, 62.0, 80.0),
+            (0.68, 82.0, 72.0),
+            (0.90, 100.0, 0.0),
+        ]
 
-    return points[-1][1]
+        for index in range(len(profile_points) - 1):
+            h0, r0, m0 = profile_points[index]
+            h1, r1, m1 = profile_points[index + 1]
+            if h0 <= height_percent <= h1:
+                t = (height_percent - h0) / (h1 - h0)
+                h00 = 2.0 * (t ** 3) - 3.0 * (t ** 2) + 1.0
+                h10 = (t ** 3) - 2.0 * (t ** 2) + t
+                h01 = -2.0 * (t ** 3) + 3.0 * (t ** 2)
+                h11 = (t ** 3) - (t ** 2)
+                return h00 * r0 + h10 * (h1 - h0) * m0 + h01 * r1 + h11 * (h1 - h0) * m1
+
+    t = (height_percent - 0.90) / (PROFILE_MAX_T - 0.90)
+    t = max(0.0, min(1.0, t))
+    return 16.0 + 84.0 * (1.0 - (t ** 2.2))
 
 
 def create_carrot_body(material):
@@ -128,9 +133,13 @@ def create_carrot_body(material):
     body.select_set(True)
     bpy.ops.object.shade_smooth()
     body.select_set(False)
-
-    modifier = body.modifiers.new("BlockoutWeightedNormals", "WEIGHTED_NORMAL")
-    modifier.keep_sharp = True
+    bpy.context.view_layer.objects.active = body
+    body.select_set(True)
+    modifier = body.modifiers.new("BlockoutSmoothSubdivision", "SUBSURF")
+    modifier.levels = 1
+    modifier.render_levels = 1
+    bpy.ops.object.modifier_apply(modifier=modifier.name)
+    body.select_set(False)
     return body
 
 
@@ -171,22 +180,30 @@ def add_uv_sphere(name, location, scale, material, segments=16, rings=8):
 
 
 def create_leaf_stems(primary_material, highlight_material):
-    stem_base_z = BODY_HEIGHT * PROFILE_MAX_T + 0.006
+    stem_base_z = BODY_HEIGHT * PROFILE_MAX_T - 0.018
+    stem_root_z = stem_base_z - 0.055
+
+    add_uv_sphere(
+        "LeafStem_RoundedRoot_Knot",
+        (0.0, 0.0, stem_base_z + 0.005),
+        (0.135, 0.125, 0.095),
+        primary_material,
+        16,
+        8,
+    )
+
     stems = [
-        ("LeafStem_Center", [(0.00, 0.00, stem_base_z), (0.00, 0.00, 2.78), (0.00, 0.00, 3.13)], 0.048),
-        ("LeafStem_LeftTall", [(0.00, 0.00, stem_base_z), (-0.08, 0.00, 2.74), (-0.24, 0.02, 3.00)], 0.047),
-        ("LeafStem_RightTall", [(0.00, 0.00, stem_base_z), (0.08, 0.00, 2.74), (0.25, -0.02, 2.98)], 0.047),
-        ("LeafStem_LeftWide", [(0.00, 0.00, stem_base_z), (-0.16, 0.02, 2.64), (-0.46, 0.08, 2.78)], 0.044),
-        ("LeafStem_RightWide", [(0.00, 0.00, stem_base_z), (0.16, -0.02, 2.64), (0.48, -0.07, 2.80)], 0.044),
-        ("LeafStem_Front", [(0.00, 0.00, stem_base_z), (0.06, -0.18, 2.66), (0.12, -0.40, 2.84)], 0.043),
-        ("LeafStem_Back", [(0.00, 0.00, stem_base_z), (-0.06, 0.18, 2.66), (-0.12, 0.40, 2.84)], 0.043),
+        ("LeafStem_Center", [(0.00, 0.00, stem_root_z), (0.00, 0.00, 2.66), (0.00, 0.00, 2.96)], 0.086),
+        ("LeafStem_Left", [(-0.03, 0.00, stem_root_z), (-0.06, 0.00, 2.61), (-0.24, 0.02, 2.83)], 0.083),
+        ("LeafStem_Right", [(0.03, 0.00, stem_root_z), (0.06, 0.00, 2.61), (0.25, -0.02, 2.83)], 0.083),
+        ("LeafStem_Back", [(0.00, 0.03, stem_root_z), (0.02, 0.09, 2.58), (0.08, 0.24, 2.78)], 0.078),
     ]
 
     created = []
     for name, points, radius in stems:
         created.append(create_bezier_stem(name, points, radius, primary_material))
         tip = Vector(points[-1])
-        add_uv_sphere(f"{name}_RoundedTip", tip, (radius * 1.06, radius * 1.06, radius * 1.06), highlight_material, 12, 6)
+        add_uv_sphere(f"{name}_RoundedTip", tip, (radius * 1.18, radius * 1.18, radius * 1.18), primary_material, 16, 8)
 
     return created
 
