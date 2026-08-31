@@ -20,7 +20,7 @@
       "name": "bottom_blunt_tip",
       "heightPercent": 0,
       "radiusPercent": 26,
-      "status": "proposed"
+      "status": "locked"
     },
     {
       "id": "P1",
@@ -66,6 +66,7 @@
     "P4_to_P5_must_round_into_visible_orange_top",
     "visible_orange_top_must_not_form_bowl_or_platform",
     "leaves_must_grow_upright_from_top_center_not_cover_top",
+    "leaf_cluster_must_use_5_to_7_cartoon_rounded_stems_not_flat_leaves",
     "no_horizontal_belly_ring",
     "bottom_blunt_tip_direction_preserved"
   ],
@@ -73,11 +74,11 @@
     "passed": [
       "visible_orange_top_body_shape",
       "smooth_inverted_cone_body",
-      "P4_widest_point"
+      "P4_widest_point",
+      "bottom_blunt_tip"
     ],
     "revisionRequested": [
-      "larger_upright_then_spreading_leaf_cluster",
-      "narrower_rounder_bottom_no_flat_edge"
+      "cartoon_upright_leaf_stems_no_flat_leaves"
     ]
   }
 }
