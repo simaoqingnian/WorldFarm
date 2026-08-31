@@ -42,6 +42,10 @@ crashlytics-build.properties
 # Local setup logs
 tools/install-logs/
 
+# Python generated caches
+__pycache__/
+*.py[cod]
+
 # Blender local backup files
 *.blend1
 *.blend2

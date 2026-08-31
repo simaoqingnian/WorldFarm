@@ -8,6 +8,7 @@ namespace WorldFarm.Runtime
     public sealed class AssetPreviewScene : MonoBehaviour
     {
         private const string GeneratedRootName = "GeneratedAssetPreview";
+        private const string ImportedCarrotModelResourcePath = "AssetPreview/Carrot/Crop_Carrot_Normal_v001_model";
         private const string ImportedCarrotBlockoutResourcePath = "AssetPreview/Carrot/Crop_Carrot_Normal_v001_blockout";
         private const float CarrotTopY = 0.98f;
         private const float CarrotHeight = 2.72f;
@@ -141,7 +142,8 @@ namespace WorldFarm.Runtime
             AddStage(root, materials);
 
             var carrotPivot = CreatePreviewSlot(root, "Slot_Carrot", new Vector3(-1.48f, 0f, 1.18f), 0.52f, materials.Platform, materials.PlatformDark);
-            if (!BuildImportedCarrotBlockout(carrotPivot, materials, 1.34f))
+            if (!BuildImportedCarrot(ImportedCarrotModelResourcePath, "Asset_Carrot_Normal_v001_Model", carrotPivot, materials, 1.34f) &&
+                !BuildImportedCarrot(ImportedCarrotBlockoutResourcePath, "Asset_Carrot_Normal_v001_Blockout", carrotPivot, materials, 1.34f))
             {
                 BuildCarrot(carrotPivot, materials, 0.31f);
             }
@@ -217,16 +219,16 @@ namespace WorldFarm.Runtime
             return pivot;
         }
 
-        private static bool BuildImportedCarrotBlockout(Transform parent, PreviewMaterials materials, float targetHeight)
+        private static bool BuildImportedCarrot(string resourcePath, string instanceName, Transform parent, PreviewMaterials materials, float targetHeight)
         {
-            var importedModel = Resources.Load<GameObject>(ImportedCarrotBlockoutResourcePath);
+            var importedModel = Resources.Load<GameObject>(resourcePath);
             if (importedModel == null)
             {
                 return false;
             }
 
             var model = Object.Instantiate(importedModel, parent, false);
-            model.name = "Asset_Carrot_Normal_v001_Blockout";
+            model.name = instanceName;
             model.transform.localPosition = Vector3.zero;
             model.transform.localRotation = Quaternion.identity;
             model.transform.localScale = Vector3.one;
@@ -242,9 +244,19 @@ namespace WorldFarm.Runtime
             foreach (var renderer in renderers)
             {
                 var objectName = renderer.gameObject.name.ToLowerInvariant();
-                renderer.sharedMaterial = objectName.Contains("body")
-                    ? materials.CarrotBody
-                    : materials.Leaf;
+                if (objectName.Contains("growthmark") || objectName.Contains("growth"))
+                {
+                    renderer.sharedMaterial = materials.CarrotRidge;
+                }
+                else if (objectName.Contains("body"))
+                {
+                    renderer.sharedMaterial = materials.CarrotBody;
+                }
+                else
+                {
+                    renderer.sharedMaterial = materials.Leaf;
+                }
+
                 renderer.shadowCastingMode = ShadowCastingMode.On;
                 renderer.receiveShadows = true;
             }

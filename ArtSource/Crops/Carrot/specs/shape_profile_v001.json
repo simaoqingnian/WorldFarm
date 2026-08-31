@@ -1,6 +1,6 @@
 {
   "assetId": "Crop_Carrot_Normal_v001",
-  "stage": "unity_preview",
+  "stage": "model_review",
   "confirmedDecisions": {
     "overallProportion": "short_fat_height_to_width_2_2",
     "topTreatment": "visible_orange_top_with_center_leaf_cluster",
@@ -182,10 +182,36 @@
     ]
   },
   "unityPreview": {
-    "status": "apk_built",
+    "status": "passed",
     "scene": "UnityProject/Assets/WorldFarm/Scenes/AssetPreview.unity",
     "resourceModelPath": "UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Crop_Carrot_Normal_v001_blockout.fbx",
     "androidApkPath": "Builds/Android/WorldFarm-dev.apk",
-    "builtDate": "2026-08-31"
+    "builtDate": "2026-08-31",
+    "passedDate": "2026-08-31",
+    "userFeedback": [
+      "passed",
+      "next_step"
+    ]
+  },
+  "model": {
+    "status": "in_review",
+    "blenderVersion": "5.2.1 LTS",
+    "sourceFile": "blender/carrot_normal_v001_model.blend",
+    "generatorScript": "blender/create_carrot_model_v001.py",
+    "exportFile": "exports/Crop_Carrot_Normal_v001_model.fbx",
+    "unityResourceModelPath": "UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Crop_Carrot_Normal_v001_model.fbx",
+    "screenshots": [
+      "screenshots/v001_model_front.png",
+      "screenshots/v001_model_side.png",
+      "screenshots/v001_model_three_quarter.png",
+      "screenshots/v001_model_top.png"
+    ],
+    "reviewNotes": [
+      "base silhouette and blockout proportions preserved",
+      "warm orange body material added",
+      "green leaf material variations added",
+      "short non-ring growth marks added",
+      "leaf tip ends remain blunt without center bumps"
+    ]
   }
 }
