@@ -9,6 +9,7 @@
 - `Crop_Carrot_Normal_v001_blockout.fbx`
 - `Crop_Carrot_Normal_v001_model.fbx`
 - `Crop_Carrot_Normal_v001_model_r02.fbx`
+- `Crop_Carrot_Normal_v001_model_r03.fbx`
 
 导出规则：
 

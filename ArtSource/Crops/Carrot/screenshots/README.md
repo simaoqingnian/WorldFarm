@@ -20,6 +20,10 @@
 - `v001_model_r02_side.png`
 - `v001_model_r02_three_quarter.png`
 - `v001_model_r02_top.png`
+- `v001_model_r03_front.png`
+- `v001_model_r03_side.png`
+- `v001_model_r03_three_quarter.png`
+- `v001_model_r03_top.png`
 - `v001_unity_preview.png`
 - `v001_android_portrait.png`
 

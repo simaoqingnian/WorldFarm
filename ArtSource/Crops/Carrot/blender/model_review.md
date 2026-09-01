@@ -2,16 +2,20 @@
 
 ## 文件
 
-- 当前验收版本：`r02`
-- Blender 源文件：`carrot_normal_v001_model_r02.blend`
-- 生成脚本：`create_carrot_model_r02.py`
-- FBX 导出：`../exports/Crop_Carrot_Normal_v001_model_r02.fbx`
-- Unity 预览资源：`../../../UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Crop_Carrot_Normal_v001_model_r02.fbx`
+- 当前验收版本：`r03`
+- Blender 源文件：`carrot_normal_v001_model_r03.blend`
+- 生成脚本：`create_carrot_model_r03.py`
+- FBX 导出：`../exports/Crop_Carrot_Normal_v001_model_r03.fbx`
+- Unity 预览资源：`../../../UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Crop_Carrot_Normal_v001_model_r03.fbx`
+- 纹理：
+  - `../textures/Carrot_Skin_Base_r03.png`
+  - `../textures/Carrot_Top_Crown_r03.png`
+  - `../textures/Carrot_Leaf_Stem_r03.png`
 - 截图：
-  - `../screenshots/v001_model_r02_front.png`
-  - `../screenshots/v001_model_r02_side.png`
-  - `../screenshots/v001_model_r02_three_quarter.png`
-  - `../screenshots/v001_model_r02_top.png`
+  - `../screenshots/v001_model_r03_front.png`
+  - `../screenshots/v001_model_r03_side.png`
+  - `../screenshots/v001_model_r03_three_quarter.png`
+  - `../screenshots/v001_model_r03_top.png`
 
 ## 上一版反馈
 
@@ -32,6 +36,24 @@
 - 叶茎增加主色、深色、根部色和短高光条。
 - 叶茎高光条不延伸到末端，避免端面再次出现小突起。
 
+`r02` 没有锁定。
+
+用户反馈：
+
+- 胡萝卜纹理只有一面有，其它角度都是光滑的。
+- 纹理不自然。
+- 顶部没有纹理，非常光滑，整体不自然。
+- 需要先生成自然一点的纹理图再贴上去。
+
+`r03` 修订：
+
+- 从几何贴片纹理改为 UV 贴图纹理。
+- 新增主体环绕表皮贴图，正面、侧面、背面都会有纹理。
+- 新增顶部冠部贴图，顶部不再是纯色光滑面。
+- 新增叶茎贴图，保留叶茎层次。
+- 修正 Blender 5.2 渲染器标识，使用 `BLENDER_EEVEE` 预览贴图，避免 Workbench 截图不显示纹理。
+- Unity/Tuanjie 预览加载 `r03`，并从 `Resources` 加载 PNG 贴图。
+
 ## 已锁定基础体块
 
 - 主体：平滑倒圆锥，P4 附近最宽。
@@ -44,8 +66,9 @@
 ## 本阶段只看
 
 - 基础材质是否符合“轻写实圆润农场 3D”。
-- 胡萝卜主体颜色是否温暖、明亮、不过脏。
-- 短生长痕是否增加质感，同时不形成环形凸带。
+- 胡萝卜主体环绕贴图是否自然，旋转后各角度是否都有纹理。
+- 顶部冠部纹理是否解决纯色光滑问题。
+- 短生长痕是否增加质感，同时不形成几何环形凸带。
 - 叶茎颜色层次是否自然。
 - Unity 预览里 model 版是否比 blockout 版更适合作为正式资产基础。
 
@@ -61,9 +84,10 @@
 ## 反馈格式
 
 ```text
-主体材质：通过 / 太亮 / 太暗 / 太塑料 / 太脏 / 不够温暖
-生长痕：通过 / 太多 / 太少 / 太深 / 太浅 / 仍像环带 / 位置不自然
-叶茎材质：通过 / 太亮 / 太暗 / 层次太少 / 风格不一致
-Unity 预览：通过 / 太大 / 太小 / 太亮 / 太暗 / 旋转不好看
+主体贴图：通过 / 太重 / 太淡 / 太像南瓜沟槽 / 仍不自然 / 颜色不对
+多角度纹理：通过 / 侧面太光滑 / 背面太光滑 / 接缝明显
+顶部纹理：通过 / 太重 / 太淡 / 仍太光滑 / 像放射沟槽
+叶茎材质：通过 / 层次仍太少 / 纹理太重 / 太暗 / 风格不一致
+Unity 预览：通过 / 太大 / 太小 / 太亮 / 太暗 / 看不清纹理 / 旋转不好看
 是否锁定普通胡萝卜 v001：是 / 否
 ```

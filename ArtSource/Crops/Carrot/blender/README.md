@@ -7,9 +7,11 @@
 - `carrot_normal_v001_blockout.blend`
 - `carrot_normal_v001_model.blend`
 - `carrot_normal_v001_model_r02.blend`
+- `carrot_normal_v001_model_r03.blend`
 - `create_carrot_blockout_v001.py`
 - `create_carrot_model_v001.py`
 - `create_carrot_model_r02.py`
+- `create_carrot_model_r03.py`
 - `blockout_review.md`
 - `model_review.md`
 
@@ -23,3 +25,4 @@
 - `../exports/Crop_Carrot_Normal_v001_blockout.fbx`
 - `../exports/Crop_Carrot_Normal_v001_model.fbx`
 - `../exports/Crop_Carrot_Normal_v001_model_r02.fbx`
+- `../exports/Crop_Carrot_Normal_v001_model_r03.fbx`

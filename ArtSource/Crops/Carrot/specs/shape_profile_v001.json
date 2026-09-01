@@ -196,16 +196,26 @@
   "model": {
     "status": "in_review",
     "blenderVersion": "5.2.1 LTS",
-    "currentReviewRevision": "r02",
-    "sourceFile": "blender/carrot_normal_v001_model_r02.blend",
-    "generatorScript": "blender/create_carrot_model_r02.py",
-    "exportFile": "exports/Crop_Carrot_Normal_v001_model_r02.fbx",
-    "unityResourceModelPath": "UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Crop_Carrot_Normal_v001_model_r02.fbx",
+    "currentReviewRevision": "r03",
+    "sourceFile": "blender/carrot_normal_v001_model_r03.blend",
+    "generatorScript": "blender/create_carrot_model_r03.py",
+    "exportFile": "exports/Crop_Carrot_Normal_v001_model_r03.fbx",
+    "unityResourceModelPath": "UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Crop_Carrot_Normal_v001_model_r03.fbx",
+    "textureFiles": [
+      "textures/Carrot_Skin_Base_r03.png",
+      "textures/Carrot_Top_Crown_r03.png",
+      "textures/Carrot_Leaf_Stem_r03.png"
+    ],
+    "unityTextureResourcePaths": [
+      "UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Textures/Carrot_Skin_Base_r03.png",
+      "UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Textures/Carrot_Top_Crown_r03.png",
+      "UnityProject/Assets/WorldFarm/Resources/AssetPreview/Carrot/Textures/Carrot_Leaf_Stem_r03.png"
+    ],
     "screenshots": [
-      "screenshots/v001_model_r02_front.png",
-      "screenshots/v001_model_r02_side.png",
-      "screenshots/v001_model_r02_three_quarter.png",
-      "screenshots/v001_model_r02_top.png"
+      "screenshots/v001_model_r03_front.png",
+      "screenshots/v001_model_r03_side.png",
+      "screenshots/v001_model_r03_three_quarter.png",
+      "screenshots/v001_model_r03_top.png"
     ],
     "reviewNotes": [
       "base silhouette and blockout proportions preserved",
@@ -218,6 +228,17 @@
       "r02_vertical_skin_grain_added",
       "r02_growth_marks_increased_to_11_and_enlarged",
       "r02_leaf_material_layers_added",
+      "r02_user_feedback_texture_only_on_one_side",
+      "r02_user_feedback_texture_unnatural",
+      "r02_user_feedback_top_too_smooth",
+      "r02_not_locked",
+      "r03_changed_from_geometry_marks_to_uv_textures",
+      "r03_body_uses_wrapping_skin_texture",
+      "r03_top_uses_crown_texture",
+      "r03_leaf_stems_use_texture",
+      "r03_blender_renderer_changed_to_blender_eevee",
+      "r03_first_pass_vertical_texture_too_heavy_then_reduced",
+      "r03_unity_preview_loads_texture_resources",
       "leaf tip ends remain blunt without center bumps"
     ],
     "revisionFeedback": [
@@ -242,6 +263,31 @@
           "growth_marks_increased_and_redistributed",
           "leaf_primary_secondary_shadow_highlight_material_layers_added",
           "unity_preview_loader_changed_to_model_r02_first"
+        ]
+      },
+      {
+        "date": "2026-09-01",
+        "round": "model_r02",
+        "userFeedback": [
+          "carrot_texture_only_on_one_side",
+          "other_angles_are_smooth",
+          "texture_not_natural",
+          "top_has_no_texture_and_is_too_smooth",
+          "request_generate_natural_texture_image_then_apply"
+        ],
+        "changes": [
+          "kept_locked_blockout_shape",
+          "created_model_r03_revision",
+          "removed_single_side_geometry_texture_marks",
+          "generated_wrapping_body_skin_texture",
+          "generated_top_crown_texture",
+          "generated_leaf_stem_texture",
+          "body_uses_cylindrical_uv_for_all_angles",
+          "top_uses_dedicated_uv_texture",
+          "blender_preview_renderer_changed_to_blender_eevee",
+          "first_r03_texture_pass_reduced_after_heavy_pumpkin_like_vertical_grooves",
+          "unity_preview_loader_changed_to_model_r03_first",
+          "unity_runtime_materials_load_png_textures_from_resources"
         ]
       }
     ]

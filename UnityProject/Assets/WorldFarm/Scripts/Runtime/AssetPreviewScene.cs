@@ -8,9 +8,13 @@ namespace WorldFarm.Runtime
     public sealed class AssetPreviewScene : MonoBehaviour
     {
         private const string GeneratedRootName = "GeneratedAssetPreview";
-        private const string ImportedCarrotModelResourcePath = "AssetPreview/Carrot/Crop_Carrot_Normal_v001_model_r02";
-        private const string ImportedCarrotPreviousModelResourcePath = "AssetPreview/Carrot/Crop_Carrot_Normal_v001_model";
+        private const string ImportedCarrotModelResourcePath = "AssetPreview/Carrot/Crop_Carrot_Normal_v001_model_r03";
+        private const string ImportedCarrotPreviousModelResourcePath = "AssetPreview/Carrot/Crop_Carrot_Normal_v001_model_r02";
+        private const string ImportedCarrotLegacyModelResourcePath = "AssetPreview/Carrot/Crop_Carrot_Normal_v001_model";
         private const string ImportedCarrotBlockoutResourcePath = "AssetPreview/Carrot/Crop_Carrot_Normal_v001_blockout";
+        private const string CarrotBodyTextureResourcePath = "AssetPreview/Carrot/Textures/Carrot_Skin_Base_r03";
+        private const string CarrotTopTextureResourcePath = "AssetPreview/Carrot/Textures/Carrot_Top_Crown_r03";
+        private const string CarrotLeafTextureResourcePath = "AssetPreview/Carrot/Textures/Carrot_Leaf_Stem_r03";
         private const float CarrotTopY = 0.98f;
         private const float CarrotHeight = 2.72f;
 
@@ -48,11 +52,15 @@ namespace WorldFarm.Runtime
             public readonly Material Grass = CreateMaterial("Warm Grass Edge", new Color(0.32f, 0.56f, 0.25f), 0.25f);
             public readonly Material Water = CreateMaterial("Soft Paddy Water", new Color(0.42f, 0.68f, 0.76f), 0.55f);
             public readonly Material CarrotBody = CreateMaterial("Carrot Matte Body", new Color(0.91f, 0.34f, 0.07f), 0.08f);
+            public readonly Material CarrotBodyTextured = CreateTexturedMaterial("Carrot Textured Body", new Color(0.91f, 0.34f, 0.07f), 0.08f, CarrotBodyTextureResourcePath);
+            public readonly Material CarrotTopTextured = CreateTexturedMaterial("Carrot Textured Top", new Color(0.90f, 0.33f, 0.07f), 0.08f, CarrotTopTextureResourcePath);
             public readonly Material CarrotRidge = CreateMaterial("Carrot Growth Scars", new Color(0.50f, 0.14f, 0.03f), 0.04f);
             public readonly Material CarrotSkinGrain = CreateMaterial("Carrot Skin Grain", new Color(0.64f, 0.19f, 0.05f), 0.03f);
             public readonly Material CarrotSkinWarm = CreateMaterial("Carrot Warm Skin Mottle", new Color(0.98f, 0.46f, 0.13f), 0.04f);
             public readonly Material Leaf = CreateMaterial("Crop Leaf", new Color(0.15f, 0.49f, 0.21f), 0.16f, true);
+            public readonly Material LeafTextured = CreateTexturedMaterial("Crop Leaf Textured", new Color(0.15f, 0.49f, 0.21f), 0.16f, CarrotLeafTextureResourcePath, true);
             public readonly Material LeafDark = CreateMaterial("Deep Crop Leaf", new Color(0.05f, 0.27f, 0.13f), 0.10f, true);
+            public readonly Material LeafDarkTextured = CreateTexturedMaterial("Deep Crop Leaf Textured", new Color(0.05f, 0.27f, 0.13f), 0.10f, CarrotLeafTextureResourcePath, true);
             public readonly Material LeafLight = CreateMaterial("Fresh Leaf Highlight", new Color(0.37f, 0.68f, 0.27f), 0.14f, true);
             public readonly Material CabbageOuter = CreateMaterial("Cabbage Outer Leaf", new Color(0.33f, 0.61f, 0.28f), 0.34f, true);
             public readonly Material CabbageInner = CreateMaterial("Cabbage Inner Leaf", new Color(0.70f, 0.82f, 0.48f), 0.38f, true);
@@ -145,8 +153,9 @@ namespace WorldFarm.Runtime
             AddStage(root, materials);
 
             var carrotPivot = CreatePreviewSlot(root, "Slot_Carrot", new Vector3(-1.48f, 0f, 1.18f), 0.52f, materials.Platform, materials.PlatformDark);
-            if (!BuildImportedCarrot(ImportedCarrotModelResourcePath, "Asset_Carrot_Normal_v001_Model_r02", carrotPivot, materials, 1.34f) &&
-                !BuildImportedCarrot(ImportedCarrotPreviousModelResourcePath, "Asset_Carrot_Normal_v001_Model", carrotPivot, materials, 1.34f) &&
+            if (!BuildImportedCarrot(ImportedCarrotModelResourcePath, "Asset_Carrot_Normal_v001_Model_r03", carrotPivot, materials, 1.34f) &&
+                !BuildImportedCarrot(ImportedCarrotPreviousModelResourcePath, "Asset_Carrot_Normal_v001_Model_r02", carrotPivot, materials, 1.34f) &&
+                !BuildImportedCarrot(ImportedCarrotLegacyModelResourcePath, "Asset_Carrot_Normal_v001_Model", carrotPivot, materials, 1.34f) &&
                 !BuildImportedCarrot(ImportedCarrotBlockoutResourcePath, "Asset_Carrot_Normal_v001_Blockout", carrotPivot, materials, 1.34f))
             {
                 BuildCarrot(carrotPivot, materials, 0.31f);
@@ -248,9 +257,23 @@ namespace WorldFarm.Runtime
             foreach (var renderer in renderers)
             {
                 var objectName = renderer.gameObject.name.ToLowerInvariant();
-                if (objectName.Contains("leafstemhighlight"))
+                if (objectName.Contains("body") && objectName.Contains("textured"))
+                {
+                    ApplyTexturedCarrotBodyMaterials(renderer, materials);
+                }
+                else if (objectName.Contains("leafstemhighlight"))
                 {
                     renderer.sharedMaterial = materials.LeafLight;
+                }
+                else if (objectName.Contains("leafstem") && objectName.Contains("textured"))
+                {
+                    renderer.sharedMaterial = objectName.Contains("secondary") || objectName.Contains("shadow")
+                        ? materials.LeafDarkTextured
+                        : materials.LeafTextured;
+                }
+                else if (objectName.Contains("roundedroot") && objectName.Contains("textured"))
+                {
+                    renderer.sharedMaterial = materials.LeafDarkTextured;
                 }
                 else if (objectName.Contains("root") ||
                          objectName.Contains("secondary") ||
@@ -282,6 +305,24 @@ namespace WorldFarm.Runtime
                 renderer.shadowCastingMode = ShadowCastingMode.On;
                 renderer.receiveShadows = true;
             }
+        }
+
+        private static void ApplyTexturedCarrotBodyMaterials(Renderer renderer, PreviewMaterials materials)
+        {
+            var sharedMaterials = renderer.sharedMaterials;
+            if (sharedMaterials.Length == 0)
+            {
+                renderer.sharedMaterial = materials.CarrotBodyTextured;
+                return;
+            }
+
+            sharedMaterials[0] = materials.CarrotBodyTextured;
+            if (sharedMaterials.Length > 1)
+            {
+                sharedMaterials[1] = materials.CarrotTopTextured;
+            }
+
+            renderer.sharedMaterials = sharedMaterials;
         }
 
         private static void FitImportedModelToSlot(Transform model, float targetHeight)
@@ -614,6 +655,32 @@ namespace WorldFarm.Runtime
             if (doubleSided && material.HasProperty("_Cull"))
             {
                 material.SetInt("_Cull", (int)CullMode.Off);
+            }
+
+            return material;
+        }
+
+        private static Material CreateTexturedMaterial(string name, Color color, float smoothness, string textureResourcePath, bool doubleSided = false)
+        {
+            var material = CreateMaterial(name, color, smoothness, doubleSided);
+            var texture = Resources.Load<Texture2D>(textureResourcePath);
+            if (texture == null)
+            {
+                return material;
+            }
+
+            texture.wrapMode = TextureWrapMode.Repeat;
+            texture.filterMode = FilterMode.Bilinear;
+            texture.anisoLevel = 1;
+
+            if (material.HasProperty("_MainTex"))
+            {
+                material.SetTexture("_MainTex", texture);
+            }
+
+            if (material.HasProperty("_BaseMap"))
+            {
+                material.SetTexture("_BaseMap", texture);
             }
 
             return material;
