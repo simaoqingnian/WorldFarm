@@ -15,6 +15,7 @@ WorldFarm 是一款轻量经营向种菜游戏。玩家从中国农场开始，�
 细化文档：
 
 - [地貌、适应系数与变异系统设计](WorldFarm_BiomeMutationDesign.md)
+- [经济、加工、名产与育种系统设计](WorldFarm_EconomyProcessingBreedingDesign.md)
 - [国家与地貌设计](WorldFarm_CountryBiomeDesign.md)
 - [3D 资产开发流程与风格规范](WorldFarm_3DAssetPipeline.md)
 

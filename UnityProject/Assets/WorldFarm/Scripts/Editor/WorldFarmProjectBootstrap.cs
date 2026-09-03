@@ -16,6 +16,8 @@ namespace WorldFarm.Editor
         private const string AndroidPackageName = "com.simaoqingnian.worldfarm";
         private const string MainScenePath = "Assets/WorldFarm/Scenes/Main.unity";
         private const string AssetPreviewScenePath = "Assets/WorldFarm/Scenes/AssetPreview.unity";
+        private const string ThirdPartyCropPreviewScenePath = "Assets/WorldFarm/Scenes/ThirdPartyCropPreview.unity";
+        private const string ThirdPartyGrowthStagePreviewScenePath = "Assets/WorldFarm/Scenes/ThirdPartyGrowthStagePreview.unity";
         private const string DebugLaunchScenePath = AssetPreviewScenePath;
 
         [MenuItem("WorldFarm/Bootstrap Project")]
@@ -24,6 +26,8 @@ namespace WorldFarm.Editor
             ApplyPlayerSettings();
             EnsureMainScene();
             EnsureAssetPreviewScene();
+            EnsureThirdPartyCropPreviewScene();
+            EnsureThirdPartyGrowthStagePreviewScene();
             ConfigureBuildSettings();
             SwitchToAndroidTarget();
 
@@ -50,6 +54,52 @@ namespace WorldFarm.Editor
             if (report.summary.result != BuildResult.Succeeded)
             {
                 throw new BuildFailedException($"Android build failed: {report.summary.result}");
+            }
+        }
+
+        [MenuItem("WorldFarm/Build Third Party Crop Preview APK")]
+        public static void BuildThirdPartyCropPreviewApk()
+        {
+            Bootstrap();
+
+            var outputPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", "Builds", "Android", "WorldFarm-thirdparty-crops.apk"));
+            Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+
+            var buildOptions = new BuildPlayerOptions
+            {
+                scenes = new[] { ThirdPartyCropPreviewScenePath },
+                locationPathName = outputPath,
+                target = BuildTarget.Android,
+                options = BuildOptions.Development | BuildOptions.AllowDebugging
+            };
+
+            var report = BuildPipeline.BuildPlayer(buildOptions);
+            if (report.summary.result != BuildResult.Succeeded)
+            {
+                throw new BuildFailedException($"Third-party crop preview build failed: {report.summary.result}");
+            }
+        }
+
+        [MenuItem("WorldFarm/Build Third Party Growth Stage Preview APK")]
+        public static void BuildThirdPartyGrowthStagePreviewApk()
+        {
+            Bootstrap();
+
+            var outputPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", "Builds", "Android", "WorldFarm-thirdparty-growth-stages.apk"));
+            Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+
+            var buildOptions = new BuildPlayerOptions
+            {
+                scenes = new[] { ThirdPartyGrowthStagePreviewScenePath },
+                locationPathName = outputPath,
+                target = BuildTarget.Android,
+                options = BuildOptions.Development | BuildOptions.AllowDebugging
+            };
+
+            var report = BuildPipeline.BuildPlayer(buildOptions);
+            if (report.summary.result != BuildResult.Succeeded)
+            {
+                throw new BuildFailedException($"Third-party growth stage preview build failed: {report.summary.result}");
             }
         }
 
@@ -98,11 +148,39 @@ namespace WorldFarm.Editor
             EditorSceneManager.SaveScene(scene, AssetPreviewScenePath);
         }
 
+        private static void EnsureThirdPartyCropPreviewScene()
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(ToAbsoluteProjectPath(ThirdPartyCropPreviewScenePath)));
+
+            var scene = File.Exists(ToAbsoluteProjectPath(ThirdPartyCropPreviewScenePath))
+                ? EditorSceneManager.OpenScene(ThirdPartyCropPreviewScenePath, OpenSceneMode.Single)
+                : EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+
+            ConfigureThirdPartyCropPreviewSceneObjects();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene, ThirdPartyCropPreviewScenePath);
+        }
+
+        private static void EnsureThirdPartyGrowthStagePreviewScene()
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(ToAbsoluteProjectPath(ThirdPartyGrowthStagePreviewScenePath)));
+
+            var scene = File.Exists(ToAbsoluteProjectPath(ThirdPartyGrowthStagePreviewScenePath))
+                ? EditorSceneManager.OpenScene(ThirdPartyGrowthStagePreviewScenePath, OpenSceneMode.Single)
+                : EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+
+            ConfigureThirdPartyGrowthStagePreviewSceneObjects();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene, ThirdPartyGrowthStagePreviewScenePath);
+        }
+
         private static void ConfigureBuildSettings()
         {
             EditorBuildSettings.scenes = new[]
             {
                 new EditorBuildSettingsScene(AssetPreviewScenePath, true),
+                new EditorBuildSettingsScene(ThirdPartyCropPreviewScenePath, true),
+                new EditorBuildSettingsScene(ThirdPartyGrowthStagePreviewScenePath, true),
                 new EditorBuildSettingsScene(MainScenePath, true)
             };
         }
@@ -198,10 +276,10 @@ namespace WorldFarm.Editor
         private static void ConfigureAssetPreviewSceneObjects()
         {
             RenderSettings.ambientMode = AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = new Color(0.80f, 0.89f, 0.91f);
-            RenderSettings.ambientEquatorColor = new Color(0.53f, 0.58f, 0.48f);
-            RenderSettings.ambientGroundColor = new Color(0.25f, 0.20f, 0.15f);
-            RenderSettings.ambientIntensity = 1.08f;
+            RenderSettings.ambientSkyColor = new Color(0.84f, 0.93f, 0.95f);
+            RenderSettings.ambientEquatorColor = new Color(0.62f, 0.66f, 0.54f);
+            RenderSettings.ambientGroundColor = new Color(0.36f, 0.31f, 0.22f);
+            RenderSettings.ambientIntensity = 1.20f;
 
             var camera = Camera.main;
             if (camera == null)
@@ -216,7 +294,7 @@ namespace WorldFarm.Editor
 
             camera.gameObject.tag = "MainCamera";
             camera.clearFlags = CameraClearFlags.SolidColor;
-            camera.backgroundColor = new Color(0.62f, 0.76f, 0.80f);
+            camera.backgroundColor = new Color(0.68f, 0.82f, 0.84f);
             camera.orthographic = true;
             camera.orthographicSize = 4.75f;
             camera.nearClipPlane = 0.1f;
@@ -235,9 +313,9 @@ namespace WorldFarm.Editor
 
             keyLight.type = LightType.Directional;
             keyLight.color = new Color(1f, 0.93f, 0.79f);
-            keyLight.intensity = 1.32f;
+            keyLight.intensity = 1.26f;
             keyLight.shadows = LightShadows.Soft;
-            keyLight.shadowStrength = 0.48f;
+            keyLight.shadowStrength = 0.32f;
             keyLightObject.transform.rotation = Quaternion.Euler(48f, -32f, 19f);
 
             var fillLightObject = GameObject.Find("Preview Fill Light") ?? new GameObject("Preview Fill Light");
@@ -249,7 +327,7 @@ namespace WorldFarm.Editor
 
             fillLight.type = LightType.Point;
             fillLight.color = new Color(0.59f, 0.80f, 1f);
-            fillLight.intensity = 1.4f;
+            fillLight.intensity = 2.0f;
             fillLight.range = 8f;
             fillLight.shadows = LightShadows.None;
             fillLightObject.transform.position = new Vector3(-2.7f, 3.2f, -3.6f);
@@ -263,6 +341,154 @@ namespace WorldFarm.Editor
             }
 
             var duplicatePreviewScenes = root.GetComponents<AssetPreviewScene>();
+            for (var index = 1; index < duplicatePreviewScenes.Length; index++)
+            {
+                Object.DestroyImmediate(duplicatePreviewScenes[index]);
+            }
+        }
+
+        private static void ConfigureThirdPartyCropPreviewSceneObjects()
+        {
+            RenderSettings.ambientMode = AmbientMode.Trilight;
+            RenderSettings.ambientSkyColor = new Color(0.84f, 0.93f, 0.95f);
+            RenderSettings.ambientEquatorColor = new Color(0.64f, 0.68f, 0.55f);
+            RenderSettings.ambientGroundColor = new Color(0.34f, 0.28f, 0.20f);
+            RenderSettings.ambientIntensity = 1.18f;
+
+            var camera = Camera.main;
+            if (camera == null)
+            {
+                camera = Object.FindObjectOfType<Camera>();
+            }
+
+            if (camera == null)
+            {
+                camera = new GameObject("Main Camera").AddComponent<Camera>();
+            }
+
+            camera.gameObject.tag = "MainCamera";
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.68f, 0.82f, 0.84f);
+            camera.orthographic = true;
+            camera.orthographicSize = 4.40f;
+            camera.nearClipPlane = 0.1f;
+            camera.farClipPlane = 80f;
+            camera.transform.position = new Vector3(4.8f, 5.7f, -8.4f);
+            camera.transform.rotation = Quaternion.LookRotation(new Vector3(0f, 0.30f, 0.75f) - camera.transform.position, Vector3.up);
+
+            var keyLightObject = GameObject.Find("ThirdParty Preview Key Light") ?? GameObject.Find("Directional Light") ?? new GameObject("ThirdParty Preview Key Light");
+            keyLightObject.name = "ThirdParty Preview Key Light";
+
+            var keyLight = keyLightObject.GetComponent<Light>();
+            if (keyLight == null)
+            {
+                keyLight = keyLightObject.AddComponent<Light>();
+            }
+
+            keyLight.type = LightType.Directional;
+            keyLight.color = new Color(1f, 0.93f, 0.78f);
+            keyLight.intensity = 1.25f;
+            keyLight.shadows = LightShadows.Soft;
+            keyLight.shadowStrength = 0.28f;
+            keyLightObject.transform.rotation = Quaternion.Euler(48f, -32f, 18f);
+
+            var fillLightObject = GameObject.Find("ThirdParty Preview Fill Light") ?? new GameObject("ThirdParty Preview Fill Light");
+            var fillLight = fillLightObject.GetComponent<Light>();
+            if (fillLight == null)
+            {
+                fillLight = fillLightObject.AddComponent<Light>();
+            }
+
+            fillLight.type = LightType.Point;
+            fillLight.color = new Color(0.59f, 0.80f, 1f);
+            fillLight.intensity = 1.8f;
+            fillLight.range = 8f;
+            fillLight.shadows = LightShadows.None;
+            fillLightObject.transform.position = new Vector3(-2.8f, 3.0f, -3.6f);
+
+            var root = GameObject.Find("WorldFarmThirdPartyCropPreviewRoot") ?? new GameObject("WorldFarmThirdPartyCropPreviewRoot");
+            root.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+            if (root.GetComponent<ThirdPartyCropPreviewScene>() == null)
+            {
+                root.AddComponent<ThirdPartyCropPreviewScene>();
+            }
+
+            var duplicatePreviewScenes = root.GetComponents<ThirdPartyCropPreviewScene>();
+            for (var index = 1; index < duplicatePreviewScenes.Length; index++)
+            {
+                Object.DestroyImmediate(duplicatePreviewScenes[index]);
+            }
+        }
+
+        private static void ConfigureThirdPartyGrowthStagePreviewSceneObjects()
+        {
+            RenderSettings.ambientMode = AmbientMode.Trilight;
+            RenderSettings.ambientSkyColor = new Color(0.84f, 0.93f, 0.95f);
+            RenderSettings.ambientEquatorColor = new Color(0.64f, 0.68f, 0.55f);
+            RenderSettings.ambientGroundColor = new Color(0.34f, 0.28f, 0.20f);
+            RenderSettings.ambientIntensity = 1.18f;
+
+            var camera = Camera.main;
+            if (camera == null)
+            {
+                camera = Object.FindObjectOfType<Camera>();
+            }
+
+            if (camera == null)
+            {
+                camera = new GameObject("Main Camera").AddComponent<Camera>();
+            }
+
+            camera.gameObject.tag = "MainCamera";
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.68f, 0.82f, 0.84f);
+            camera.orthographic = true;
+            camera.orthographicSize = 4.60f;
+            camera.nearClipPlane = 0.1f;
+            camera.farClipPlane = 90f;
+            camera.transform.position = new Vector3(0f, 6.7f, -7.4f);
+            camera.transform.rotation = Quaternion.LookRotation(new Vector3(0f, 0.38f, 0f) - camera.transform.position, Vector3.up);
+
+            var keyLightObject = GameObject.Find("Growth Stage Preview Key Light") ?? GameObject.Find("Directional Light") ?? new GameObject("Growth Stage Preview Key Light");
+            keyLightObject.name = "Growth Stage Preview Key Light";
+
+            var keyLight = keyLightObject.GetComponent<Light>();
+            if (keyLight == null)
+            {
+                keyLight = keyLightObject.AddComponent<Light>();
+            }
+
+            keyLight.type = LightType.Directional;
+            keyLight.color = new Color(1f, 0.93f, 0.78f);
+            keyLight.intensity = 1.23f;
+            keyLight.shadows = LightShadows.Soft;
+            keyLight.shadowStrength = 0.26f;
+            keyLightObject.transform.rotation = Quaternion.Euler(50f, -25f, 18f);
+
+            var fillLightObject = GameObject.Find("Growth Stage Preview Fill Light") ?? new GameObject("Growth Stage Preview Fill Light");
+            var fillLight = fillLightObject.GetComponent<Light>();
+            if (fillLight == null)
+            {
+                fillLight = fillLightObject.AddComponent<Light>();
+            }
+
+            fillLight.type = LightType.Point;
+            fillLight.color = new Color(0.59f, 0.80f, 1f);
+            fillLight.intensity = 1.8f;
+            fillLight.range = 8f;
+            fillLight.shadows = LightShadows.None;
+            fillLightObject.transform.position = new Vector3(-2.6f, 3.2f, -3.8f);
+
+            var root = GameObject.Find("WorldFarmThirdPartyGrowthStagePreviewRoot") ?? new GameObject("WorldFarmThirdPartyGrowthStagePreviewRoot");
+            root.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+            if (root.GetComponent<ThirdPartyGrowthStagePreviewScene>() == null)
+            {
+                root.AddComponent<ThirdPartyGrowthStagePreviewScene>();
+            }
+
+            var duplicatePreviewScenes = root.GetComponents<ThirdPartyGrowthStagePreviewScene>();
             for (var index = 1; index < duplicatePreviewScenes.Length; index++)
             {
                 Object.DestroyImmediate(duplicatePreviewScenes[index]);

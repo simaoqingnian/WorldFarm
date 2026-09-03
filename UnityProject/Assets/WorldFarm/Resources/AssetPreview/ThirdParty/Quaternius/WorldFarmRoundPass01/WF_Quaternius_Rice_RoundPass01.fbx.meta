@@ -1,0 +1,453 @@
+fileFormatVersion: 2
+guid: W3kbt3v+BSgug7OG+qqBweo3Z1/oAn+BvPJWeULqwZAUJuGMYFgT8x4=
+ModelImporter:
+  serializedVersion: 22361
+  internalIDToNameTable: []
+  externalObjects: {}
+  materials:
+    materialImportMode: 2
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    removeConstantScaleCurves: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    aCLCompressionLevel: 3
+    aCLCurvePrecision: 0.01
+    aCLFastSampleMode: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 0
+    tuanjieGIEnable: 0
+    tuanjieGIGenSDFFactor: 1
+    tuanjieGIGenSDFBias: 0.25
+    tuanjieGIDoubleSidedMode: 0
+    tuanjieGIGenFacetNums: 12
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    totalVerticesCount: 5740
+    totalTrianglesCount: 8146
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
+    importPhysicalCameras: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    nodeNameCollisionStrategy: 1
+    fileIdsGeneration: 2
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    keepQuads: 0
+    weldVertices: 1
+    bakeAxisConversion: 0
+    preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    optimizeBones: 1
+    meshOptimizationFlags: -1
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVMarginMethod: 1
+    secondaryUVMinLightmapResolution: 40
+    secondaryUVMinObjectScale: 1
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    strictVertexDataChecks: 0
+  virtualGeometry:
+    virtualGeometry: 0
+    useTransparent: 0
+    setVGForeachMesh: 0
+    isFirstUse: 1
+    virtualGeometrySettings:
+      generateGeometryBuffer: 0
+      surfaceCompensation: 0
+      allMeshUse: 1
+      ignoreSimpleMesh: 0
+      transformScaleState: 0
+      isPossibleOverflow: 0
+      hasBoneData: 0
+      isBoneCountOverflow: 0
+    virtualGeometryPlatformSettings: []
+    selectedVGMeshes:
+    - index: 0
+      meshName: WF_RoundPass01_Rice_Leaf_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 1
+      meshName: WF_RoundPass01_Rice_Leaf_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 2
+      meshName: WF_RoundPass01_Rice_Leaf_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 3
+      meshName: WF_RoundPass01_Rice_Panicle_0_axis
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 4
+      meshName: WF_RoundPass01_Rice_Panicle_0_grain_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 5
+      meshName: WF_RoundPass01_Rice_Panicle_0_grain_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 6
+      meshName: WF_RoundPass01_Rice_Panicle_0_grain_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 7
+      meshName: WF_RoundPass01_Rice_Panicle_0_grain_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 8
+      meshName: WF_RoundPass01_Rice_Panicle_1_axis
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 9
+      meshName: WF_RoundPass01_Rice_Panicle_1_grain_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 10
+      meshName: WF_RoundPass01_Rice_Panicle_1_grain_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 11
+      meshName: WF_RoundPass01_Rice_Panicle_1_grain_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 12
+      meshName: WF_RoundPass01_Rice_Panicle_1_grain_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 13
+      meshName: WF_RoundPass01_Rice_Panicle_2_axis
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 14
+      meshName: WF_RoundPass01_Rice_Panicle_2_grain_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 15
+      meshName: WF_RoundPass01_Rice_Panicle_2_grain_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 16
+      meshName: WF_RoundPass01_Rice_Panicle_2_grain_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 17
+      meshName: WF_RoundPass01_Rice_Panicle_2_grain_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 18
+      meshName: WF_RoundPass01_Rice_Panicle_3_axis
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 19
+      meshName: WF_RoundPass01_Rice_Panicle_3_grain_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 20
+      meshName: WF_RoundPass01_Rice_Panicle_3_grain_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 21
+      meshName: WF_RoundPass01_Rice_Panicle_3_grain_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 22
+      meshName: WF_RoundPass01_Rice_Panicle_3_grain_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 23
+      meshName: WF_RoundPass01_Rice_Panicle_4_axis
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 24
+      meshName: WF_RoundPass01_Rice_Panicle_4_grain_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 25
+      meshName: WF_RoundPass01_Rice_Panicle_4_grain_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 26
+      meshName: WF_RoundPass01_Rice_Panicle_4_grain_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 27
+      meshName: WF_RoundPass01_Rice_Panicle_4_grain_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 28
+      meshName: WF_RoundPass01_Rice_Panicle_5_axis
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 29
+      meshName: WF_RoundPass01_Rice_Panicle_5_grain_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 30
+      meshName: WF_RoundPass01_Rice_Panicle_5_grain_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 31
+      meshName: WF_RoundPass01_Rice_Panicle_5_grain_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 32
+      meshName: WF_RoundPass01_Rice_Panicle_5_grain_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 33
+      meshName: WF_RoundPass01_Rice_Stem_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 34
+      meshName: WF_RoundPass01_Rice_Stem_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 35
+      meshName: WF_RoundPass01_Rice_Stem_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 36
+      meshName: WF_RoundPass01_Rice_Stem_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 37
+      meshName: WF_RoundPass01_Rice_Stem_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 38
+      meshName: WF_RoundPass01_Rice_Stem_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    supportVGMeshes:
+    - index: 0
+      meshName: WF_RoundPass01_Rice_Leaf_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 1
+      meshName: WF_RoundPass01_Rice_Leaf_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 2
+      meshName: WF_RoundPass01_Rice_Leaf_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 3
+      meshName: WF_RoundPass01_Rice_Panicle_0_axis
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 4
+      meshName: WF_RoundPass01_Rice_Panicle_0_grain_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 5
+      meshName: WF_RoundPass01_Rice_Panicle_0_grain_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 6
+      meshName: WF_RoundPass01_Rice_Panicle_0_grain_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 7
+      meshName: WF_RoundPass01_Rice_Panicle_0_grain_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 8
+      meshName: WF_RoundPass01_Rice_Panicle_1_axis
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 9
+      meshName: WF_RoundPass01_Rice_Panicle_1_grain_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 10
+      meshName: WF_RoundPass01_Rice_Panicle_1_grain_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 11
+      meshName: WF_RoundPass01_Rice_Panicle_1_grain_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 12
+      meshName: WF_RoundPass01_Rice_Panicle_1_grain_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 13
+      meshName: WF_RoundPass01_Rice_Panicle_2_axis
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 14
+      meshName: WF_RoundPass01_Rice_Panicle_2_grain_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 15
+      meshName: WF_RoundPass01_Rice_Panicle_2_grain_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 16
+      meshName: WF_RoundPass01_Rice_Panicle_2_grain_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 17
+      meshName: WF_RoundPass01_Rice_Panicle_2_grain_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 18
+      meshName: WF_RoundPass01_Rice_Panicle_3_axis
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 19
+      meshName: WF_RoundPass01_Rice_Panicle_3_grain_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 20
+      meshName: WF_RoundPass01_Rice_Panicle_3_grain_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 21
+      meshName: WF_RoundPass01_Rice_Panicle_3_grain_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 22
+      meshName: WF_RoundPass01_Rice_Panicle_3_grain_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 23
+      meshName: WF_RoundPass01_Rice_Panicle_4_axis
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 24
+      meshName: WF_RoundPass01_Rice_Panicle_4_grain_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 25
+      meshName: WF_RoundPass01_Rice_Panicle_4_grain_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 26
+      meshName: WF_RoundPass01_Rice_Panicle_4_grain_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 27
+      meshName: WF_RoundPass01_Rice_Panicle_4_grain_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 28
+      meshName: WF_RoundPass01_Rice_Panicle_5_axis
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 29
+      meshName: WF_RoundPass01_Rice_Panicle_5_grain_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 30
+      meshName: WF_RoundPass01_Rice_Panicle_5_grain_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 31
+      meshName: WF_RoundPass01_Rice_Panicle_5_grain_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 32
+      meshName: WF_RoundPass01_Rice_Panicle_5_grain_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 33
+      meshName: WF_RoundPass01_Rice_Stem_0
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 34
+      meshName: WF_RoundPass01_Rice_Stem_1
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 35
+      meshName: WF_RoundPass01_Rice_Stem_2
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 36
+      meshName: WF_RoundPass01_Rice_Stem_3
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 37
+      meshName: WF_RoundPass01_Rice_Stem_4
+      lodLevel: 0
+      meshGeometryBuffer: 0
+    - index: 38
+      meshName: WF_RoundPass01_Rice_Stem_5
+      lodLevel: 0
+      meshGeometryBuffer: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  referencedClips: []
+  importAnimation: 1
+  overrideDefaultPose: 0
+  humanDescription:
+    serializedVersion: 3
+    human: []
+    skeleton: []
+    namedPoseList:
+    - name: Default
+      skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    globalScale: 1
+    rootMotionBoneName: 
+    defaultPoseIndex: -1
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
+  humanoidOversampling: 1
+  avatarSetup: 0
+  addHumanoidExtraRootOnlyWhenUsingAvatar: 1
+  importBlendShapeDeformPercent: 1
+  remapMaterialsIfMaterialImportModeIsNone: 0
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

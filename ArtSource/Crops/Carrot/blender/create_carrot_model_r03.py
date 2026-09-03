@@ -125,36 +125,36 @@ def create_body_texture():
     pixels = [0.0] * (width * height * 4)
     fibers = []
 
-    for _ in range(56):
+    for _ in range(22):
         fibers.append(
             (
                 rng.random(),
-                rng.uniform(0.0025, 0.0105),
-                rng.uniform(-0.050, 0.038),
+                rng.uniform(0.0075, 0.0180),
+                rng.uniform(-0.018, 0.014),
                 rng.uniform(0.7, 2.2),
                 rng.random() * math.tau,
             )
         )
 
-    base = (0.92, 0.36, 0.070, 1.0)
-    warm = (0.99, 0.49, 0.135, 1.0)
-    dark = (0.54, 0.16, 0.035, 1.0)
+    base = (0.94, 0.43, 0.085, 1.0)
+    warm = (1.00, 0.60, 0.170, 1.0)
+    dark = (0.57, 0.21, 0.045, 1.0)
 
     for y in range(height):
         v = y / (height - 1)
-        top_warmth = 0.035 * (v ** 1.4)
-        bottom_shadow = -0.035 * ((1.0 - v) ** 2.2)
+        top_warmth = 0.026 * (v ** 1.4)
+        bottom_shadow = -0.024 * ((1.0 - v) ** 2.2)
 
         for x in range(width):
             u = x / width
-            low_wave = 0.017 * math.sin(math.tau * (u * 4.0 + math.sin(v * math.tau * 1.3) * 0.035))
-            low_wave += 0.012 * math.sin(math.tau * (u * 9.0 + v * 0.55))
-            fine_noise = 0.014 * math.sin(math.tau * (u * 31.0 + v * 11.0))
-            fine_noise += 0.007 * math.sin(math.tau * (u * 71.0 - v * 19.0))
+            low_wave = 0.006 * math.sin(math.tau * (u * 3.0 + math.sin(v * math.tau * 1.15) * 0.025))
+            low_wave += 0.004 * math.sin(math.tau * (u * 7.0 + v * 0.45))
+            fine_noise = 0.0035 * math.sin(math.tau * (u * 23.0 + v * 8.0))
+            fine_noise += 0.0020 * math.sin(math.tau * (u * 53.0 - v * 15.0))
 
             fiber_value = 0.0
             for center, width_u, amplitude, freq, phase in fibers:
-                shifted_center = (center + math.sin(v * math.tau * freq + phase) * 0.006) % 1.0
+                shifted_center = (center + math.sin(v * math.tau * freq + phase) * 0.003) % 1.0
                 distance = periodic_distance(u, shifted_center)
                 fiber_value += amplitude * math.exp(-0.5 * (distance / width_u) ** 2)
 
@@ -167,34 +167,34 @@ def create_body_texture():
             )
 
             if fiber_value > 0:
-                color = mix_color(color, warm, clamp01(fiber_value * 2.8))
+                color = mix_color(color, warm, clamp01(fiber_value * 1.3))
             elif fiber_value < -0.004:
-                color = mix_color(color, dark, clamp01(abs(fiber_value) * 4.4))
+                color = mix_color(color, dark, clamp01(abs(fiber_value) * 1.8))
 
             set_pixel(pixels, width, x, y, color)
 
-    for _ in range(72):
+    for _ in range(38):
         center_u = rng.random()
         center_v = rng.uniform(0.12, 0.93)
-        length_u = rng.uniform(0.035, 0.145) * (1.0 - 0.24 * center_v)
-        thickness_v = rng.uniform(0.0032, 0.0076)
-        angle_tilt = rng.uniform(-0.10, 0.10)
+        length_u = rng.uniform(0.030, 0.105) * (1.0 - 0.18 * center_v)
+        thickness_v = rng.uniform(0.0048, 0.0092)
+        angle_tilt = rng.uniform(-0.055, 0.055)
         scar_color = rng.choice(
             [
-                (0.42, 0.10, 0.022, 1.0),
-                (0.50, 0.14, 0.030, 1.0),
-                (0.68, 0.22, 0.052, 1.0),
+                (0.58, 0.23, 0.050, 1.0),
+                (0.68, 0.29, 0.065, 1.0),
+                (0.82, 0.39, 0.095, 1.0),
             ]
         )
-        strength = rng.uniform(0.36, 0.64)
+        strength = rng.uniform(0.14, 0.30)
         add_soft_stroke(pixels, width, height, center_u, center_v, length_u, thickness_v, angle_tilt, scar_color, strength, rng)
 
-    for _ in range(1600):
+    for _ in range(420):
         x = rng.randrange(width)
         y = rng.randrange(height)
         current = get_pixel(pixels, width, x, y)
-        speckle = rng.choice([(0.50, 0.14, 0.030, 1.0), (0.99, 0.50, 0.150, 1.0)])
-        set_pixel(pixels, width, x, y, mix_color(current, speckle, rng.uniform(0.06, 0.20)))
+        speckle = rng.choice([(0.57, 0.20, 0.040, 1.0), (1.00, 0.58, 0.170, 1.0)])
+        set_pixel(pixels, width, x, y, mix_color(current, speckle, rng.uniform(0.025, 0.080)))
 
     return write_image(BODY_TEXTURE_PATH, "Carrot_Skin_Base_r03", width, height, pixels)
 
@@ -203,10 +203,10 @@ def create_top_texture():
     size = 512
     rng = random.Random(3104)
     pixels = [0.0] * (size * size * 4)
-    base = (0.91, 0.34, 0.070, 1.0)
-    warm = (0.98, 0.45, 0.120, 1.0)
-    dark = (0.52, 0.16, 0.040, 1.0)
-    crack_angles = [(rng.random() * math.tau, rng.uniform(0.12, 0.88), rng.uniform(0.28, 0.92)) for _ in range(32)]
+    base = (0.94, 0.43, 0.085, 1.0)
+    warm = (1.00, 0.57, 0.160, 1.0)
+    dark = (0.56, 0.21, 0.045, 1.0)
+    crack_angles = [(rng.random() * math.tau, rng.uniform(0.16, 0.84), rng.uniform(0.32, 0.88)) for _ in range(14)]
 
     for y in range(size):
         v = (y + 0.5) / size
@@ -216,10 +216,10 @@ def create_top_texture():
             dx = u * 2.0 - 1.0
             radius = math.sqrt(dx * dx + dy * dy)
             angle = math.atan2(dy, dx)
-            ring = 0.026 * math.sin(radius * math.tau * 7.0 + math.sin(angle * 3.0) * 0.55)
-            radial = 0.020 * math.sin(angle * 13.0 + radius * 8.0)
-            center_darken = -0.090 * math.exp(-0.5 * (radius / 0.25) ** 2)
-            edge_warm = 0.038 * clamp01(radius)
+            ring = 0.010 * math.sin(radius * math.tau * 5.0 + math.sin(angle * 3.0) * 0.35)
+            radial = 0.007 * math.sin(angle * 9.0 + radius * 6.0)
+            center_darken = -0.038 * math.exp(-0.5 * (radius / 0.28) ** 2)
+            edge_warm = 0.024 * clamp01(radius)
             color = (
                 base[0] + ring + radial + edge_warm + center_darken,
                 base[1] + ring * 0.75 + radial * 0.45 + edge_warm * 0.7 + center_darken * 0.55,
@@ -229,8 +229,8 @@ def create_top_texture():
 
             for crack_angle, start_radius, end_radius in crack_angles:
                 angle_delta = abs(math.atan2(math.sin(angle - crack_angle), math.cos(angle - crack_angle)))
-                if start_radius < radius < end_radius and angle_delta < 0.022:
-                    color = mix_color(color, dark, 0.46 * (1.0 - angle_delta / 0.022))
+                if start_radius < radius < end_radius and angle_delta < 0.018:
+                    color = mix_color(color, dark, 0.18 * (1.0 - angle_delta / 0.018))
 
             if radius > 0.58 and radius < 0.95:
                 color = mix_color(color, warm, 0.12)
@@ -249,16 +249,16 @@ def create_leaf_texture():
     light = (0.35, 0.66, 0.25, 1.0)
     dark = (0.04, 0.23, 0.10, 1.0)
 
-    stripe_centers = [rng.random() for _ in range(16)]
+    stripe_centers = [rng.random() for _ in range(10)]
     for y in range(height):
         v = y / (height - 1)
-        root_shadow = 0.35 * ((1.0 - v) ** 2.6)
+        root_shadow = 0.24 * ((1.0 - v) ** 2.6)
         for x in range(width):
             u = x / width
-            tone = 0.015 * math.sin(math.tau * (u * 6.0 + v * 0.2))
+            tone = 0.008 * math.sin(math.tau * (u * 5.0 + v * 0.2))
             for center in stripe_centers:
                 distance = periodic_distance(u, center)
-                tone += 0.030 * math.exp(-0.5 * (distance / 0.012) ** 2)
+                tone += 0.014 * math.exp(-0.5 * (distance / 0.018) ** 2)
 
             color = (
                 base[0] + tone,
@@ -558,8 +558,8 @@ def main():
     top_texture = create_top_texture()
     leaf_texture = create_leaf_texture()
 
-    body_material = create_material("Mat_Carrot_Body_Texture_r03", (0.91, 0.34, 0.07, 1.0), 0.98, 0.0, body_texture)
-    top_material = create_material("Mat_Carrot_Top_Texture_r03", (0.90, 0.33, 0.07, 1.0), 0.98, 0.0, top_texture)
+    body_material = create_material("Mat_Carrot_Body_Texture_r03", (0.94, 0.43, 0.085, 1.0), 0.98, 0.0, body_texture)
+    top_material = create_material("Mat_Carrot_Top_Texture_r03", (0.93, 0.41, 0.085, 1.0), 0.98, 0.0, top_texture)
     leaf_primary = create_material("Mat_Carrot_LeafPrimary_Texture_r03", (0.13, 0.48, 0.20, 1.0), 0.88, 0.03, leaf_texture)
     leaf_secondary = create_material("Mat_Carrot_LeafSecondary_Texture_r03", (0.08, 0.35, 0.16, 1.0), 0.90, 0.02, leaf_texture)
     leaf_highlight = create_material("Mat_Carrot_LeafHighlight_r03", (0.34, 0.66, 0.25, 1.0), 0.84, 0.03)

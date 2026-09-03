@@ -51,16 +51,16 @@ namespace WorldFarm.Runtime
             public readonly Material Ridge = CreateMaterial("Field Ridge", new Color(0.33f, 0.22f, 0.13f), 0.14f);
             public readonly Material Grass = CreateMaterial("Warm Grass Edge", new Color(0.32f, 0.56f, 0.25f), 0.25f);
             public readonly Material Water = CreateMaterial("Soft Paddy Water", new Color(0.42f, 0.68f, 0.76f), 0.55f);
-            public readonly Material CarrotBody = CreateMaterial("Carrot Matte Body", new Color(0.91f, 0.34f, 0.07f), 0.08f);
-            public readonly Material CarrotBodyTextured = CreateTexturedMaterial("Carrot Textured Body", new Color(0.91f, 0.34f, 0.07f), 0.08f, CarrotBodyTextureResourcePath);
-            public readonly Material CarrotTopTextured = CreateTexturedMaterial("Carrot Textured Top", new Color(0.90f, 0.33f, 0.07f), 0.08f, CarrotTopTextureResourcePath);
-            public readonly Material CarrotRidge = CreateMaterial("Carrot Growth Scars", new Color(0.50f, 0.14f, 0.03f), 0.04f);
-            public readonly Material CarrotSkinGrain = CreateMaterial("Carrot Skin Grain", new Color(0.64f, 0.19f, 0.05f), 0.03f);
-            public readonly Material CarrotSkinWarm = CreateMaterial("Carrot Warm Skin Mottle", new Color(0.98f, 0.46f, 0.13f), 0.04f);
+            public readonly Material CarrotBody = CreateMaterial("Carrot Matte Body", new Color(0.94f, 0.43f, 0.08f), 0.08f);
+            public readonly Material CarrotBodyTextured = CreateTexturedMaterial("Carrot Textured Body", Color.white, 0.08f, CarrotBodyTextureResourcePath);
+            public readonly Material CarrotTopTextured = CreateTexturedMaterial("Carrot Textured Top", Color.white, 0.08f, CarrotTopTextureResourcePath);
+            public readonly Material CarrotRidge = CreateMaterial("Carrot Growth Scars", new Color(0.57f, 0.20f, 0.04f), 0.04f);
+            public readonly Material CarrotSkinGrain = CreateMaterial("Carrot Skin Grain", new Color(0.70f, 0.27f, 0.06f), 0.03f);
+            public readonly Material CarrotSkinWarm = CreateMaterial("Carrot Warm Skin Mottle", new Color(1.00f, 0.58f, 0.16f), 0.04f);
             public readonly Material Leaf = CreateMaterial("Crop Leaf", new Color(0.15f, 0.49f, 0.21f), 0.16f, true);
-            public readonly Material LeafTextured = CreateTexturedMaterial("Crop Leaf Textured", new Color(0.15f, 0.49f, 0.21f), 0.16f, CarrotLeafTextureResourcePath, true);
+            public readonly Material LeafTextured = CreateTexturedMaterial("Crop Leaf Textured", Color.white, 0.16f, CarrotLeafTextureResourcePath, true);
             public readonly Material LeafDark = CreateMaterial("Deep Crop Leaf", new Color(0.05f, 0.27f, 0.13f), 0.10f, true);
-            public readonly Material LeafDarkTextured = CreateTexturedMaterial("Deep Crop Leaf Textured", new Color(0.05f, 0.27f, 0.13f), 0.10f, CarrotLeafTextureResourcePath, true);
+            public readonly Material LeafDarkTextured = CreateTexturedMaterial("Deep Crop Leaf Textured", new Color(0.78f, 0.88f, 0.78f), 0.10f, CarrotLeafTextureResourcePath, true);
             public readonly Material LeafLight = CreateMaterial("Fresh Leaf Highlight", new Color(0.37f, 0.68f, 0.27f), 0.14f, true);
             public readonly Material CabbageOuter = CreateMaterial("Cabbage Outer Leaf", new Color(0.33f, 0.61f, 0.28f), 0.34f, true);
             public readonly Material CabbageInner = CreateMaterial("Cabbage Inner Leaf", new Color(0.70f, 0.82f, 0.48f), 0.38f, true);
@@ -93,10 +93,10 @@ namespace WorldFarm.Runtime
         private void ConfigureScene()
         {
             RenderSettings.ambientMode = AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = new Color(0.80f, 0.89f, 0.91f);
-            RenderSettings.ambientEquatorColor = new Color(0.53f, 0.58f, 0.48f);
-            RenderSettings.ambientGroundColor = new Color(0.25f, 0.20f, 0.15f);
-            RenderSettings.ambientIntensity = 1.08f;
+            RenderSettings.ambientSkyColor = new Color(0.84f, 0.93f, 0.95f);
+            RenderSettings.ambientEquatorColor = new Color(0.62f, 0.66f, 0.54f);
+            RenderSettings.ambientGroundColor = new Color(0.36f, 0.31f, 0.22f);
+            RenderSettings.ambientIntensity = 1.20f;
 
             QualitySettings.antiAliasing = 4;
             QualitySettings.shadows = ShadowQuality.All;
@@ -111,7 +111,7 @@ namespace WorldFarm.Runtime
             }
 
             camera.clearFlags = CameraClearFlags.SolidColor;
-            camera.backgroundColor = new Color(0.62f, 0.76f, 0.80f);
+            camera.backgroundColor = new Color(0.68f, 0.82f, 0.84f);
             camera.orthographic = true;
             camera.orthographicSize = 4.75f;
             camera.nearClipPlane = 0.1f;
@@ -125,16 +125,16 @@ namespace WorldFarm.Runtime
             var keyLight = keyLightObject.GetComponent<Light>() ?? keyLightObject.AddComponent<Light>();
             keyLight.type = LightType.Directional;
             keyLight.color = new Color(1f, 0.93f, 0.79f);
-            keyLight.intensity = 1.32f;
+            keyLight.intensity = 1.26f;
             keyLight.shadows = LightShadows.Soft;
-            keyLight.shadowStrength = 0.48f;
+            keyLight.shadowStrength = 0.32f;
             keyLightObject.transform.rotation = Quaternion.Euler(48f, -32f, 19f);
 
             var fillLightObject = GameObject.Find("Preview Fill Light") ?? new GameObject("Preview Fill Light");
             var fillLight = fillLightObject.GetComponent<Light>() ?? fillLightObject.AddComponent<Light>();
             fillLight.type = LightType.Point;
             fillLight.color = new Color(0.59f, 0.80f, 1f);
-            fillLight.intensity = 1.4f;
+            fillLight.intensity = 2.0f;
             fillLight.range = 8f;
             fillLight.shadows = LightShadows.None;
             fillLightObject.transform.position = new Vector3(-2.7f, 3.2f, -3.6f);
@@ -809,7 +809,7 @@ namespace WorldFarm.Runtime
         {
             var vertices = new Vector3[(segments + 1) * 2];
             var uvs = new Vector2[vertices.Length];
-            var triangles = new int[segments * 12];
+            var triangles = new int[segments * 6];
 
             for (var segment = 0; segment <= segments; segment++)
             {
@@ -843,13 +843,6 @@ namespace WorldFarm.Runtime
                 triangles[triangleIndex++] = left1;
                 triangles[triangleIndex++] = right1;
 
-                triangles[triangleIndex++] = left0;
-                triangles[triangleIndex++] = right0;
-                triangles[triangleIndex++] = left1;
-
-                triangles[triangleIndex++] = right0;
-                triangles[triangleIndex++] = right1;
-                triangles[triangleIndex++] = left1;
             }
 
             return FinalizeMesh("Preview Leaf", vertices, uvs, triangles);
