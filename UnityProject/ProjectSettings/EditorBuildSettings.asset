@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/WorldFarm/Scenes/Prototype3DGameplay.unity
+    guid: 024dee3a63a23d544a7c90233717af50
+  - enabled: 1
     path: Assets/WorldFarm/Scenes/PrototypeGameplay.unity
     guid: 6a25bee0754b27245ac147f1032ded09
   - enabled: 1

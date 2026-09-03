@@ -171,6 +171,28 @@ Fixed direction:
 - Delay outsourcing until gameplay scope and style rules are stable.
 - Delay Substance-style heavy texture production until the project has enough stable content to justify it.
 
+### M0.2 3D Placeholder Gameplay Prototype
+
+Implemented a 3D placeholder gameplay scene to replace the pure text/control feel for the next prototype pass.
+
+Added:
+
+- New startup/debug scene `Assets/WorldFarm/Scenes/Prototype3DGameplay.unity`.
+- New runtime scene driver `Assets/WorldFarm/Scripts/Runtime/Prototype3DGameplayScene.cs`.
+- Simple 3D placeholder world layout with farm plots, country unlock pads, biome tiles, seed rack, warehouse, order board, mutation shed, and time controls.
+- TextMesh labels attached to major 3D placeholders so temporary models are readable on device, such as `仓库`, `订单牌`, `变异棚`, crop names, biome names, and action buttons.
+- Touch/click interaction through 3D raycast targets instead of only IMGUI buttons.
+- Camera drag panning and two-finger pinch zoom for mobile testing.
+- Primitive crop placeholders for rice, wheat, cabbage, corn, tea, grape, and several stable mutation variants.
+- The M0.1 crop loop remains available conceptually: planting, local-time maturity, harvesting, orders, research points, mutation clues, and stable first-level mutation unlocks.
+
+Build/runtime notes:
+
+- The 3D placeholder scene is now first in Editor Build Settings and is the default bootstrap/debug launch scene.
+- Added the built-in Physics module because the prototype uses colliders and raycasts.
+- Built Android development APK at `Builds/Android/WorldFarm-prototype-3d.apk`.
+- This APK is intentionally committed for this handoff even though build outputs are normally ignored.
+
 ### Notes For Continuing On Another Computer
 
 - Pull the repository.

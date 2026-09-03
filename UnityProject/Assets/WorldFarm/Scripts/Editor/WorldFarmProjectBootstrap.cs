@@ -19,7 +19,8 @@ namespace WorldFarm.Editor
         private const string ThirdPartyCropPreviewScenePath = "Assets/WorldFarm/Scenes/ThirdPartyCropPreview.unity";
         private const string ThirdPartyGrowthStagePreviewScenePath = "Assets/WorldFarm/Scenes/ThirdPartyGrowthStagePreview.unity";
         private const string PrototypeGameplayScenePath = "Assets/WorldFarm/Scenes/PrototypeGameplay.unity";
-        private const string DebugLaunchScenePath = PrototypeGameplayScenePath;
+        private const string Prototype3DGameplayScenePath = "Assets/WorldFarm/Scenes/Prototype3DGameplay.unity";
+        private const string DebugLaunchScenePath = Prototype3DGameplayScenePath;
 
         [MenuItem("WorldFarm/Bootstrap Project")]
         public static void Bootstrap()
@@ -30,6 +31,7 @@ namespace WorldFarm.Editor
             EnsureThirdPartyCropPreviewScene();
             EnsureThirdPartyGrowthStagePreviewScene();
             EnsurePrototypeGameplayScene();
+            EnsurePrototype3DGameplayScene();
             ConfigureBuildSettings();
             SwitchToAndroidTarget();
 
@@ -128,6 +130,29 @@ namespace WorldFarm.Editor
             }
         }
 
+        [MenuItem("WorldFarm/Build Prototype 3D Gameplay APK")]
+        public static void BuildPrototype3DGameplayApk()
+        {
+            Bootstrap();
+
+            var outputPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", "Builds", "Android", "WorldFarm-prototype-3d.apk"));
+            Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+
+            var buildOptions = new BuildPlayerOptions
+            {
+                scenes = new[] { Prototype3DGameplayScenePath },
+                locationPathName = outputPath,
+                target = BuildTarget.Android,
+                options = BuildOptions.Development | BuildOptions.AllowDebugging
+            };
+
+            var report = BuildPipeline.BuildPlayer(buildOptions);
+            if (report.summary.result != BuildResult.Succeeded)
+            {
+                throw new BuildFailedException($"Prototype 3D gameplay build failed: {report.summary.result}");
+            }
+        }
+
         private static void ApplyPlayerSettings()
         {
             PlayerSettings.companyName = CompanyName;
@@ -212,10 +237,24 @@ namespace WorldFarm.Editor
             EditorSceneManager.SaveScene(scene, PrototypeGameplayScenePath);
         }
 
+        private static void EnsurePrototype3DGameplayScene()
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(ToAbsoluteProjectPath(Prototype3DGameplayScenePath)));
+
+            var scene = File.Exists(ToAbsoluteProjectPath(Prototype3DGameplayScenePath))
+                ? EditorSceneManager.OpenScene(Prototype3DGameplayScenePath, OpenSceneMode.Single)
+                : EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+
+            ConfigurePrototype3DGameplaySceneObjects();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene, Prototype3DGameplayScenePath);
+        }
+
         private static void ConfigureBuildSettings()
         {
             EditorBuildSettings.scenes = new[]
             {
+                new EditorBuildSettingsScene(Prototype3DGameplayScenePath, true),
                 new EditorBuildSettingsScene(PrototypeGameplayScenePath, true),
                 new EditorBuildSettingsScene(AssetPreviewScenePath, true),
                 new EditorBuildSettingsScene(ThirdPartyCropPreviewScenePath, true),
@@ -572,6 +611,79 @@ namespace WorldFarm.Editor
             }
 
             var duplicatePrototypeScenes = root.GetComponents<PrototypeGameplayScene>();
+            for (var index = 1; index < duplicatePrototypeScenes.Length; index++)
+            {
+                Object.DestroyImmediate(duplicatePrototypeScenes[index]);
+            }
+        }
+
+        private static void ConfigurePrototype3DGameplaySceneObjects()
+        {
+            RenderSettings.ambientMode = AmbientMode.Trilight;
+            RenderSettings.ambientSkyColor = new Color(0.92f, 0.96f, 0.98f);
+            RenderSettings.ambientEquatorColor = new Color(0.66f, 0.72f, 0.58f);
+            RenderSettings.ambientGroundColor = new Color(0.42f, 0.35f, 0.24f);
+            RenderSettings.ambientIntensity = 1.18f;
+
+            var camera = Camera.main;
+            if (camera == null)
+            {
+                camera = Object.FindObjectOfType<Camera>();
+            }
+
+            if (camera == null)
+            {
+                camera = new GameObject("Main Camera").AddComponent<Camera>();
+            }
+
+            camera.gameObject.tag = "MainCamera";
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.70f, 0.86f, 0.92f);
+            camera.orthographic = true;
+            camera.orthographicSize = 5.55f;
+            camera.nearClipPlane = 0.1f;
+            camera.farClipPlane = 120f;
+            camera.transform.position = new Vector3(0f, 7.8f, -7.6f);
+            camera.transform.rotation = Quaternion.LookRotation(new Vector3(0f, 0.1f, 0f) - camera.transform.position, Vector3.up);
+
+            var keyLightObject = GameObject.Find("Prototype 3D Key Light") ?? GameObject.Find("Directional Light") ?? new GameObject("Prototype 3D Key Light");
+            keyLightObject.name = "Prototype 3D Key Light";
+            var keyLight = keyLightObject.GetComponent<Light>();
+            if (keyLight == null)
+            {
+                keyLight = keyLightObject.AddComponent<Light>();
+            }
+
+            keyLight.type = LightType.Directional;
+            keyLight.color = new Color(1f, 0.94f, 0.80f);
+            keyLight.intensity = 1.28f;
+            keyLight.shadows = LightShadows.Soft;
+            keyLight.shadowStrength = 0.34f;
+            keyLightObject.transform.rotation = Quaternion.Euler(50f, -32f, 18f);
+
+            var fillLightObject = GameObject.Find("Prototype 3D Fill Light") ?? new GameObject("Prototype 3D Fill Light");
+            var fillLight = fillLightObject.GetComponent<Light>();
+            if (fillLight == null)
+            {
+                fillLight = fillLightObject.AddComponent<Light>();
+            }
+
+            fillLight.type = LightType.Point;
+            fillLight.color = new Color(0.62f, 0.82f, 1f);
+            fillLight.intensity = 1.55f;
+            fillLight.range = 9f;
+            fillLight.shadows = LightShadows.None;
+            fillLightObject.transform.position = new Vector3(-3.4f, 3.8f, -3.4f);
+
+            var root = GameObject.Find("WorldFarmPrototype3DGameplayRoot") ?? new GameObject("WorldFarmPrototype3DGameplayRoot");
+            root.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+            if (root.GetComponent<Prototype3DGameplayScene>() == null)
+            {
+                root.AddComponent<Prototype3DGameplayScene>();
+            }
+
+            var duplicatePrototypeScenes = root.GetComponents<Prototype3DGameplayScene>();
             for (var index = 1; index < duplicatePrototypeScenes.Length; index++)
             {
                 Object.DestroyImmediate(duplicatePrototypeScenes[index]);
