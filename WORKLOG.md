@@ -70,9 +70,52 @@ Later prototype layers:
 - Mutation clues and stable varieties.
 - Secondary breeding with environment recipes and result branches.
 
+### M0 Gameplay Prototype Implementation
+
+Implemented a first text/control driven Unity prototype for gameplay validation.
+
+Added:
+
+- `UnityProject/Assets/WorldFarm/Scenes/PrototypeGameplay.unity`
+- `UnityProject/Assets/WorldFarm/Scripts/Prototype/PrototypeGameplayScene.cs`
+- `WorldFarm/Build Prototype Gameplay APK` editor menu command.
+- Unity built-in module dependencies for IMGUI and JSON serialization.
+
+Current playable systems:
+
+- Local-time crop growth and maturity calculation.
+- Test time controls for fast validation: +1 minute, +10 minutes, and mature all.
+- Country unlock flow using world exploration points.
+- Country reputation as per-country progression.
+- Country biomes and multiple plot slots per biome.
+- Crop planting with biome adaptation coefficients.
+- Adaptation-based maturity speed and yield range.
+- Harvesting into inventory.
+- Repeatable orders with coin, experience, exploration point, research point, and country reputation rewards.
+- Basic inventory selling.
+- Runtime event log.
+
+Current prototype content:
+
+- Countries: China, Japan, France.
+- Biomes: North China Dry Plain, Jiangnan Paddy Field, Southwest Terrace, Vegetable Loam, Snow Country Paddy Field, Uji Tea Hill, Bordeaux Vineyard.
+- Crops: Chinese wheat, Chinese rice, Chinese cabbage, Chinese corn, Chinese tea, Japanese rice, Japanese tea, Bordeaux grape.
+
+Verification:
+
+- Tuanjie batch Bootstrap completed without C# compiler errors after enabling `com.unity.modules.imgui` and `com.unity.modules.jsonserialize`.
+- Android development APK built successfully at `Builds\Android\WorldFarm-prototype-gameplay.apk`.
+- Build artifact size: about 24.5 MB.
+
+Known prototype limits:
+
+- UI is intentionally plain IMGUI, not final production interface.
+- Mutation, processing, certification, and secondary breeding are still design-documented only and should be added in the next prototype layer.
+- Current values are first-pass test values and should be tuned after several play loops.
+
 ### Notes For Continuing On Another Computer
 
 - Pull the repository.
 - Open `UnityProject` with Tuanjie/Unity compatible with the current project version.
 - Do not rely on Unity `Library` because it is generated and ignored.
-- If asset previews need testing, rebuild APKs from the editor bootstrap methods instead of using old local build outputs.
+- If APKs need testing, rebuild them from the editor bootstrap methods instead of relying on old local build outputs.

@@ -18,7 +18,8 @@ namespace WorldFarm.Editor
         private const string AssetPreviewScenePath = "Assets/WorldFarm/Scenes/AssetPreview.unity";
         private const string ThirdPartyCropPreviewScenePath = "Assets/WorldFarm/Scenes/ThirdPartyCropPreview.unity";
         private const string ThirdPartyGrowthStagePreviewScenePath = "Assets/WorldFarm/Scenes/ThirdPartyGrowthStagePreview.unity";
-        private const string DebugLaunchScenePath = AssetPreviewScenePath;
+        private const string PrototypeGameplayScenePath = "Assets/WorldFarm/Scenes/PrototypeGameplay.unity";
+        private const string DebugLaunchScenePath = PrototypeGameplayScenePath;
 
         [MenuItem("WorldFarm/Bootstrap Project")]
         public static void Bootstrap()
@@ -28,6 +29,7 @@ namespace WorldFarm.Editor
             EnsureAssetPreviewScene();
             EnsureThirdPartyCropPreviewScene();
             EnsureThirdPartyGrowthStagePreviewScene();
+            EnsurePrototypeGameplayScene();
             ConfigureBuildSettings();
             SwitchToAndroidTarget();
 
@@ -103,6 +105,29 @@ namespace WorldFarm.Editor
             }
         }
 
+        [MenuItem("WorldFarm/Build Prototype Gameplay APK")]
+        public static void BuildPrototypeGameplayApk()
+        {
+            Bootstrap();
+
+            var outputPath = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", "Builds", "Android", "WorldFarm-prototype-gameplay.apk"));
+            Directory.CreateDirectory(Path.GetDirectoryName(outputPath));
+
+            var buildOptions = new BuildPlayerOptions
+            {
+                scenes = new[] { PrototypeGameplayScenePath },
+                locationPathName = outputPath,
+                target = BuildTarget.Android,
+                options = BuildOptions.Development | BuildOptions.AllowDebugging
+            };
+
+            var report = BuildPipeline.BuildPlayer(buildOptions);
+            if (report.summary.result != BuildResult.Succeeded)
+            {
+                throw new BuildFailedException($"Prototype gameplay build failed: {report.summary.result}");
+            }
+        }
+
         private static void ApplyPlayerSettings()
         {
             PlayerSettings.companyName = CompanyName;
@@ -174,10 +199,24 @@ namespace WorldFarm.Editor
             EditorSceneManager.SaveScene(scene, ThirdPartyGrowthStagePreviewScenePath);
         }
 
+        private static void EnsurePrototypeGameplayScene()
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(ToAbsoluteProjectPath(PrototypeGameplayScenePath)));
+
+            var scene = File.Exists(ToAbsoluteProjectPath(PrototypeGameplayScenePath))
+                ? EditorSceneManager.OpenScene(PrototypeGameplayScenePath, OpenSceneMode.Single)
+                : EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
+
+            ConfigurePrototypeGameplaySceneObjects();
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene, PrototypeGameplayScenePath);
+        }
+
         private static void ConfigureBuildSettings()
         {
             EditorBuildSettings.scenes = new[]
             {
+                new EditorBuildSettingsScene(PrototypeGameplayScenePath, true),
                 new EditorBuildSettingsScene(AssetPreviewScenePath, true),
                 new EditorBuildSettingsScene(ThirdPartyCropPreviewScenePath, true),
                 new EditorBuildSettingsScene(ThirdPartyGrowthStagePreviewScenePath, true),
@@ -492,6 +531,50 @@ namespace WorldFarm.Editor
             for (var index = 1; index < duplicatePreviewScenes.Length; index++)
             {
                 Object.DestroyImmediate(duplicatePreviewScenes[index]);
+            }
+        }
+
+        private static void ConfigurePrototypeGameplaySceneObjects()
+        {
+            RenderSettings.ambientMode = AmbientMode.Trilight;
+            RenderSettings.ambientSkyColor = new Color(0.78f, 0.86f, 0.92f);
+            RenderSettings.ambientEquatorColor = new Color(0.54f, 0.60f, 0.52f);
+            RenderSettings.ambientGroundColor = new Color(0.30f, 0.27f, 0.22f);
+            RenderSettings.ambientIntensity = 1.0f;
+
+            var camera = Camera.main;
+            if (camera == null)
+            {
+                camera = Object.FindObjectOfType<Camera>();
+            }
+
+            if (camera == null)
+            {
+                camera = new GameObject("Main Camera").AddComponent<Camera>();
+            }
+
+            camera.gameObject.tag = "MainCamera";
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = new Color(0.86f, 0.90f, 0.82f);
+            camera.orthographic = true;
+            camera.orthographicSize = 5f;
+            camera.nearClipPlane = 0.1f;
+            camera.farClipPlane = 50f;
+            camera.transform.position = new Vector3(0f, 0f, -10f);
+            camera.transform.rotation = Quaternion.identity;
+
+            var root = GameObject.Find("WorldFarmPrototypeGameplayRoot") ?? new GameObject("WorldFarmPrototypeGameplayRoot");
+            root.transform.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
+
+            if (root.GetComponent<PrototypeGameplayScene>() == null)
+            {
+                root.AddComponent<PrototypeGameplayScene>();
+            }
+
+            var duplicatePrototypeScenes = root.GetComponents<PrototypeGameplayScene>();
+            for (var index = 1; index < duplicatePrototypeScenes.Length; index++)
+            {
+                Object.DestroyImmediate(duplicatePrototypeScenes[index]);
             }
         }
 
