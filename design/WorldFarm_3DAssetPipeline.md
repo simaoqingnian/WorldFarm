@@ -4,6 +4,10 @@
 
 本文用于固化 WorldFarm 后续 3D 作物、地貌、地块、建筑和界面展示模型的开发方法，目标是让素材生产过程可控、可复用、可验收，并长期保持风格统一。
 
+项目整体的玩法优先、占位开发、CC0 素材、AI 3D 和外包取舍路线见：
+
+- [WorldFarm 美术零门槛与玩法优先开发路线](WorldFarm_ArtPrototypeDevelopmentRoute.md)
+
 更细的逐阶段建模、反馈、锁定和预览流程见：
 
 - [WorldFarm 可控建模流程](WorldFarm_ControlledModelingWorkflow.md)

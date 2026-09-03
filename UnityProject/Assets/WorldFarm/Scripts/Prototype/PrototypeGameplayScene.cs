@@ -9,6 +9,9 @@ namespace WorldFarm.Runtime
     {
         private const string SaveKey = "WorldFarm.PrototypeGameplay.v1";
         private const int SaveVersion = 1;
+        private const float ButtonHeight = 58f;
+        private const float CompactButtonHeight = 52f;
+        private const float TabHeight = 58f;
 
         private readonly PrototypeGame game = new PrototypeGame();
         private PrototypeTab currentTab;
@@ -29,6 +32,7 @@ namespace WorldFarm.Runtime
         {
             Plots,
             Crops,
+            Mutations,
             Orders,
             Inventory,
             Log
@@ -78,6 +82,9 @@ namespace WorldFarm.Runtime
                 case PrototypeTab.Crops:
                     DrawCropsTab();
                     break;
+                case PrototypeTab.Mutations:
+                    DrawMutationsTab();
+                    break;
                 case PrototypeTab.Orders:
                     DrawOrdersTab();
                     break;
@@ -101,9 +108,12 @@ namespace WorldFarm.Runtime
             }
 
             GUI.skin.label.fontSize = 22;
-            GUI.skin.button.fontSize = 22;
+            GUI.skin.button.fontSize = 26;
             GUI.skin.box.fontSize = 20;
             GUI.skin.toggle.fontSize = 20;
+            GUI.skin.button.padding = new RectOffset(12, 12, 12, 12);
+            GUI.skin.verticalScrollbar.fixedWidth = 30f;
+            GUI.skin.verticalScrollbarThumb.fixedWidth = 30f;
 
             titleStyle = new GUIStyle(GUI.skin.label)
             {
@@ -171,22 +181,25 @@ namespace WorldFarm.Runtime
         private void DrawTimeControls()
         {
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("+1 分钟 / +1m", GUILayout.Height(42f)))
+            if (GUILayout.Button("+1 分钟 / +1m", GUILayout.Height(ButtonHeight)))
             {
                 game.AdvanceTestTime(60);
             }
 
-            if (GUILayout.Button("+10 分钟 / +10m", GUILayout.Height(42f)))
+            if (GUILayout.Button("+10 分钟 / +10m", GUILayout.Height(ButtonHeight)))
             {
                 game.AdvanceTestTime(600);
             }
 
-            if (GUILayout.Button("全部成熟 / Mature All", GUILayout.Height(42f)))
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("全部成熟 / Mature All", GUILayout.Height(ButtonHeight)))
             {
                 game.MatureAllGrowingPlots();
             }
 
-            if (GUILayout.Button("重置原型 / Reset", GUILayout.Height(42f)))
+            if (GUILayout.Button("重置原型 / Reset", GUILayout.Height(ButtonHeight)))
             {
                 game.ResetState();
                 selectedCountryId = "cn";
@@ -200,8 +213,8 @@ namespace WorldFarm.Runtime
 
         private void DrawTabs()
         {
-            var tabLabels = new[] { "地块", "作物", "订单", "库存", "日志" };
-            currentTab = (PrototypeTab)GUILayout.Toolbar((int)currentTab, tabLabels, GUILayout.Height(44f));
+            var tabLabels = new[] { "地块", "作物", "变异", "订单", "库存", "日志" };
+            currentTab = (PrototypeTab)GUILayout.Toolbar((int)currentTab, tabLabels, GUILayout.Height(TabHeight));
         }
 
         private void DrawPlotsTab()
@@ -250,7 +263,7 @@ namespace WorldFarm.Runtime
                 }
 
                 GUI.enabled = unlocked || canUnlock;
-                if (GUILayout.Button((country.Id == selectedCountryId ? "已选 " : "") + text, GUILayout.Height(38f)))
+                if (GUILayout.Button((country.Id == selectedCountryId ? "已选 " : "") + text, GUILayout.Height(CompactButtonHeight)))
                 {
                     if (unlocked)
                     {
@@ -293,7 +306,7 @@ namespace WorldFarm.Runtime
                 }
 
                 GUI.enabled = unlocked;
-                if (GUILayout.Button((biome.Id == selectedBiomeId ? "已选 " : "") + label, GUILayout.Height(38f)))
+                if (GUILayout.Button((biome.Id == selectedBiomeId ? "已选 " : "") + label, GUILayout.Height(CompactButtonHeight)))
                 {
                     selectedBiomeId = biome.Id;
                     mainScroll = Vector2.zero;
@@ -321,18 +334,19 @@ namespace WorldFarm.Runtime
 
                 var unlocked = game.IsCropUnlocked(crop.Id);
                 var balance = currentBiome != null ? PrototypeBalance.Calculate(currentBiome, crop) : PrototypeBalance.Empty;
+                var lockedText = crop.IsMutation ? "变异未稳定" : "锁定 声望Lv." + crop.RequiredReputationLevel;
                 var label = string.Format(
                     "{0}{1} | {2} | {3} | {4}-{5}产量 | {6}",
                     crop.Id == selectedCropId ? "已选 " : "",
-                    crop.DisplayName,
+                    (crop.IsMutation ? "[变异] " : string.Empty) + crop.DisplayName,
                     FormatDuration(crop.GrowthSeconds),
                     FormatAdaptation(balance.adaptation),
                     balance.minYield,
                     balance.maxYield,
-                    unlocked ? crop.MutationHint : "锁定 声望Lv." + crop.RequiredReputationLevel);
+                    unlocked ? crop.MutationHint : lockedText);
 
                 GUI.enabled = unlocked;
-                if (GUILayout.Button(label, GUILayout.Height(compact ? 36f : 44f)))
+                if (GUILayout.Button(label, GUILayout.Height(compact ? CompactButtonHeight : ButtonHeight)))
                 {
                     selectedCropId = crop.Id;
                 }
@@ -365,7 +379,7 @@ namespace WorldFarm.Runtime
                             balance.minYield,
                             balance.maxYield),
                         bodyStyle);
-                    if (GUILayout.Button("播种 Plant " + selectedCrop.DisplayName, GUILayout.Height(40f)))
+                    if (GUILayout.Button("播种 Plant " + selectedCrop.DisplayName, GUILayout.Height(ButtonHeight)))
                     {
                         game.Plant(plot.plotId, selectedCrop.Id);
                     }
@@ -386,7 +400,7 @@ namespace WorldFarm.Runtime
 
                 if (plot.status == PrototypePlotStatus.Mature)
                 {
-                    if (GUILayout.Button("收获 Harvest", GUILayout.Height(40f)))
+                    if (GUILayout.Button("收获 Harvest", GUILayout.Height(ButtonHeight)))
                     {
                         game.Harvest(plot.plotId);
                     }
@@ -426,14 +440,15 @@ namespace WorldFarm.Runtime
                 var balance = PrototypeBalance.Calculate(biome, crop);
 
                 GUILayout.BeginVertical(boxStyle);
-                GUILayout.Label(crop.DisplayName + " / " + crop.Id + (unlocked ? "" : " | 锁定"), sectionStyle);
+                GUILayout.Label((crop.IsMutation ? "[变异] " : string.Empty) + crop.DisplayName + " / " + crop.Id + (unlocked ? "" : " | 锁定"), sectionStyle);
                 GUILayout.Label(
                     string.Format(
-                        "类别 {0} | 基础售价 {1} | 基础产量 {2} | 成熟 {3}",
+                        "类别 {0} | 基础售价 {1} | 基础产量 {2} | 成熟 {3} | 自然变异 {4}",
                         crop.Category,
                         crop.BasePrice,
                         crop.BaseYield,
-                        FormatDuration(crop.GrowthSeconds)),
+                        FormatDuration(crop.GrowthSeconds),
+                        crop.NaturalMutationEnabled ? "开启" : "关闭"),
                     bodyStyle);
                 GUILayout.Label(
                     string.Format(
@@ -445,9 +460,9 @@ namespace WorldFarm.Runtime
                         balance.maxYield,
                         balance.mutationChance),
                     bodyStyle);
-                GUILayout.Label(unlocked ? crop.MutationHint : "需要国家声望 Lv." + crop.RequiredReputationLevel, unlocked ? mutedStyle : warningStyle);
+                GUILayout.Label(unlocked ? crop.MutationHint : (crop.IsMutation ? "需要在变异页稳定培养。" : "需要国家声望 Lv." + crop.RequiredReputationLevel), unlocked ? mutedStyle : warningStyle);
                 GUI.enabled = unlocked;
-                if (GUILayout.Button("选择为播种作物 Select", GUILayout.Height(38f)))
+                if (GUILayout.Button("选择为播种作物 Select", GUILayout.Height(ButtonHeight)))
                 {
                     selectedCropId = crop.Id;
                     currentTab = PrototypeTab.Plots;
@@ -456,6 +471,94 @@ namespace WorldFarm.Runtime
 
                 GUI.enabled = true;
                 GUILayout.EndVertical();
+            }
+        }
+
+        private void DrawMutationsTab()
+        {
+            DrawCountrySelector();
+
+            GUILayout.Label("一级变异 First Mutations", sectionStyle);
+            GUILayout.Label("普通作物在特定地貌收获时可能获得线索；线索和研究点足够后可以稳定成独立新品种。", mutedStyle);
+
+            var hasAny = false;
+            var rules = PrototypeCatalog.MutationRules;
+            for (var i = 0; i < rules.Length; i++)
+            {
+                var rule = rules[i];
+                var baseCrop = PrototypeCatalog.GetCrop(rule.BaseCropId);
+                var resultCrop = PrototypeCatalog.GetCrop(rule.ResultCropId);
+                var biome = PrototypeCatalog.GetBiome(rule.TriggerBiomeId);
+                if (baseCrop == null || resultCrop == null || biome == null || baseCrop.CountryId != selectedCountryId)
+                {
+                    continue;
+                }
+
+                hasAny = true;
+                var balance = PrototypeBalance.Calculate(biome, baseCrop);
+                var clueCount = game.GetInventoryCount(rule.ClueItemId);
+                var stable = game.IsMutationCropUnlocked(rule.ResultCropId);
+                var triggerUnlocked = game.IsBiomeUnlocked(rule.TriggerBiomeId) && game.IsCropUnlocked(rule.BaseCropId);
+                var canStabilize = game.CanStabilizeMutation(rule);
+
+                GUILayout.BeginVertical(boxStyle);
+                GUILayout.Label(rule.DisplayName + (stable ? " | 已稳定 Stable" : string.Empty), sectionStyle);
+                GUILayout.Label("触发组合: " + baseCrop.DisplayName + " + " + biome.DisplayName, bodyStyle);
+                GUILayout.Label(rule.Description, mutedStyle);
+                GUILayout.Label(
+                    string.Format(
+                        "线索 Clues {0}/{1} | 研究 Research {2}/{3} | 当前触发概率 {4:P1}",
+                        clueCount,
+                        rule.RequiredClueCount,
+                        game.State.researchPoints,
+                        rule.RequiredResearchPoints,
+                        balance.mutationChance),
+                    bodyStyle);
+
+                if (!stable)
+                {
+                    GUILayout.BeginHorizontal();
+                    GUI.enabled = triggerUnlocked;
+                    if (GUILayout.Button(triggerUnlocked ? "去试种 Trial Plant" : "触发组合未解锁", GUILayout.Height(ButtonHeight)))
+                    {
+                        selectedBiomeId = rule.TriggerBiomeId;
+                        selectedCropId = rule.BaseCropId;
+                        currentTab = PrototypeTab.Plots;
+                        mainScroll = Vector2.zero;
+                    }
+
+                    GUI.enabled = canStabilize;
+                    if (GUILayout.Button(canStabilize ? "稳定培养 Stabilize" : "线索或研究不足", GUILayout.Height(ButtonHeight)))
+                    {
+                        game.StabilizeMutation(rule.Id);
+                        EnsureSelection();
+                    }
+
+                    GUI.enabled = true;
+                    GUILayout.EndHorizontal();
+
+                    if (GUILayout.Button("测试加 1 线索 / Debug +1 Clue", GUILayout.Height(CompactButtonHeight)))
+                    {
+                        game.AddMutationClueForDebug(rule.Id);
+                    }
+                }
+                else
+                {
+                    GUILayout.Label("稳定品种会单独进入播种列表和仓库；普通种植不会继续自然变异。", mutedStyle);
+                    if (GUILayout.Button("选择稳定品种播种 Select Stable Crop", GUILayout.Height(ButtonHeight)))
+                    {
+                        selectedCropId = rule.ResultCropId;
+                        currentTab = PrototypeTab.Plots;
+                        mainScroll = Vector2.zero;
+                    }
+                }
+
+                GUILayout.EndVertical();
+            }
+
+            if (!hasAny)
+            {
+                GUILayout.Label("当前国家暂时没有一级变异规则。", mutedStyle);
             }
         }
 
@@ -490,7 +593,7 @@ namespace WorldFarm.Runtime
 
                 var canSubmit = game.CanSubmitOrder(order);
                 GUI.enabled = canSubmit;
-                if (GUILayout.Button(canSubmit ? "提交订单 Submit" : "库存不足 Missing Items", GUILayout.Height(40f)))
+                if (GUILayout.Button(canSubmit ? "提交订单 Submit" : "库存不足 Missing Items", GUILayout.Height(ButtonHeight)))
                 {
                     game.SubmitOrder(order, selectedCountryId);
                     EnsureSelection();
@@ -519,23 +622,43 @@ namespace WorldFarm.Runtime
                 }
 
                 var crop = PrototypeCatalog.GetCrop(stack.itemId);
+                var mutationRule = PrototypeCatalog.GetMutationRuleByClueItem(stack.itemId);
                 GUILayout.BeginVertical(boxStyle);
                 GUILayout.Label(game.GetItemDisplayName(stack.itemId) + " x" + stack.count, sectionStyle);
                 if (crop != null)
                 {
-                    GUILayout.Label("基础售价 Base Price: " + crop.BasePrice + " | 用于订单、后续加工和育种。", bodyStyle);
+                    GUILayout.Label(
+                        (crop.IsMutation ? "稳定变异品种 Stable Mutation | " : string.Empty) +
+                        "基础售价 Base Price: " + crop.BasePrice + " | 用于订单、后续加工和育种。",
+                        bodyStyle);
                     GUILayout.BeginHorizontal();
-                    if (GUILayout.Button("出售 1 / Sell 1", GUILayout.Height(38f)))
+                    if (GUILayout.Button("出售 1 / Sell 1", GUILayout.Height(CompactButtonHeight)))
                     {
                         game.SellItem(stack.itemId, 1);
                     }
 
-                    if (GUILayout.Button("全部出售 / Sell All", GUILayout.Height(38f)))
+                    if (GUILayout.Button("全部出售 / Sell All", GUILayout.Height(CompactButtonHeight)))
                     {
                         game.SellItem(stack.itemId, stack.count);
                     }
 
                     GUILayout.EndHorizontal();
+                }
+                else if (mutationRule != null)
+                {
+                    var baseCrop = PrototypeCatalog.GetCrop(mutationRule.BaseCropId);
+                    GUILayout.Label("一级变异线索 Mutation Clue | 用于稳定培养，不能直接出售。", bodyStyle);
+                    GUILayout.Label("来源: " + (baseCrop != null ? baseCrop.DisplayName : mutationRule.BaseCropId) + " | " + mutationRule.Description, mutedStyle);
+                    if (GUILayout.Button("查看变异培养 / Open Mutations", GUILayout.Height(ButtonHeight)))
+                    {
+                        if (baseCrop != null)
+                        {
+                            selectedCountryId = baseCrop.CountryId;
+                        }
+
+                        currentTab = PrototypeTab.Mutations;
+                        mainScroll = Vector2.zero;
+                    }
                 }
                 else
                 {
@@ -678,6 +801,7 @@ namespace WorldFarm.Runtime
             public List<PrototypePlotStateData> plots = new List<PrototypePlotStateData>();
             public List<PrototypeInventoryStack> inventory = new List<PrototypeInventoryStack>();
             public List<PrototypeOrderProgressState> orders = new List<PrototypeOrderProgressState>();
+            public List<string> stableMutationCropIds = new List<string>();
             public List<PrototypeLogEntry> logs = new List<PrototypeLogEntry>();
         }
 
@@ -877,15 +1001,31 @@ namespace WorldFarm.Runtime
                 }
 
                 var crop = PrototypeCatalog.GetCrop(plot.cropId);
+                var biome = PrototypeCatalog.GetBiome(plot.biomeId);
                 var yield = UnityEngine.Random.Range(Mathf.Max(1, plot.expectedMinYield), Mathf.Max(1, plot.expectedMaxYield) + 1);
                 AddInventory(plot.cropId, yield);
 
-                AddLog(
-                    string.Format(
-                        "收获 {0} x{1}，适应 {2:0.00} / Harvested.",
-                        crop != null ? crop.DisplayName : plot.cropId,
-                        yield,
-                        plot.adaptation));
+                var message = string.Format(
+                    "收获 {0} x{1}，适应 {2:0.00} / Harvested.",
+                    crop != null ? crop.DisplayName : plot.cropId,
+                    yield,
+                    plot.adaptation);
+
+                var mutationRule = crop != null && biome != null ? PrototypeCatalog.GetMutationRuleForPlanting(crop.Id, biome.Id) : null;
+                if (mutationRule != null && crop.NaturalMutationEnabled && !IsMutationCropUnlocked(mutationRule.ResultCropId))
+                {
+                    var balance = PrototypeBalance.Calculate(biome, crop);
+                    if (UnityEngine.Random.value < balance.mutationChance)
+                    {
+                        AddInventory(mutationRule.ClueItemId, 1);
+                        message += "\n发现变异线索：" + mutationRule.ClueDisplayName + " / Mutation clue found.";
+
+                        if (GetInventoryCount(mutationRule.ClueItemId) >= mutationRule.RequiredClueCount)
+                        {
+                            message += "\n线索已足够，可到“变异”页稳定培养。";
+                        }
+                    }
+                }
 
                 plot.status = PrototypePlotStatus.Empty;
                 plot.cropId = string.Empty;
@@ -895,6 +1035,7 @@ namespace WorldFarm.Runtime
                 plot.expectedMinYield = 0;
                 plot.expectedMaxYield = 0;
 
+                AddLog(message, false);
                 Save();
                 return true;
             }
@@ -1009,7 +1150,74 @@ namespace WorldFarm.Runtime
                     return false;
                 }
 
+                if (crop.IsMutation)
+                {
+                    return IsMutationCropUnlocked(crop.Id);
+                }
+
                 return GetCountryLevel(crop.CountryId) >= crop.RequiredReputationLevel;
+            }
+
+            public bool IsMutationCropUnlocked(string cropId)
+            {
+                var crop = PrototypeCatalog.GetCrop(cropId);
+                if (crop == null || !crop.IsMutation || !IsCountryUnlocked(crop.CountryId))
+                {
+                    return false;
+                }
+
+                return State.stableMutationCropIds.Contains(cropId);
+            }
+
+            public bool CanStabilizeMutation(PrototypeMutationRuleDef rule)
+            {
+                if (rule == null || IsMutationCropUnlocked(rule.ResultCropId))
+                {
+                    return false;
+                }
+
+                var resultCrop = PrototypeCatalog.GetCrop(rule.ResultCropId);
+                if (resultCrop == null || !IsCountryUnlocked(resultCrop.CountryId))
+                {
+                    return false;
+                }
+
+                return GetInventoryCount(rule.ClueItemId) >= rule.RequiredClueCount && State.researchPoints >= rule.RequiredResearchPoints;
+            }
+
+            public bool StabilizeMutation(string ruleId)
+            {
+                var rule = PrototypeCatalog.GetMutationRule(ruleId);
+                if (!CanStabilizeMutation(rule))
+                {
+                    return false;
+                }
+
+                RemoveInventory(rule.ClueItemId, rule.RequiredClueCount);
+                State.researchPoints -= rule.RequiredResearchPoints;
+                if (!State.stableMutationCropIds.Contains(rule.ResultCropId))
+                {
+                    State.stableMutationCropIds.Add(rule.ResultCropId);
+                }
+
+                var resultCrop = PrototypeCatalog.GetCrop(rule.ResultCropId);
+                AddLog("稳定培养成功：" + (resultCrop != null ? resultCrop.DisplayName : rule.ResultCropId) + " 已加入播种列表 / Mutation stabilized.");
+                Save();
+                return true;
+            }
+
+            public bool AddMutationClueForDebug(string ruleId)
+            {
+                var rule = PrototypeCatalog.GetMutationRule(ruleId);
+                if (rule == null || IsMutationCropUnlocked(rule.ResultCropId))
+                {
+                    return false;
+                }
+
+                AddInventory(rule.ClueItemId, 1);
+                AddLog("测试添加线索：" + rule.ClueDisplayName + " / Debug clue added.");
+                Save();
+                return true;
             }
 
             public bool IsOrderVisible(PrototypeOrderDef order, string selectedCountryId)
@@ -1072,6 +1280,12 @@ namespace WorldFarm.Runtime
                 if (crop != null)
                 {
                     return crop.DisplayName;
+                }
+
+                var mutationRule = PrototypeCatalog.GetMutationRuleByClueItem(itemId);
+                if (mutationRule != null)
+                {
+                    return mutationRule.ClueDisplayName;
                 }
 
                 return itemId;
@@ -1141,6 +1355,11 @@ namespace WorldFarm.Runtime
                     State.orders = new List<PrototypeOrderProgressState>();
                 }
 
+                if (State.stableMutationCropIds == null)
+                {
+                    State.stableMutationCropIds = new List<string>();
+                }
+
                 if (State.logs == null)
                 {
                     State.logs = new List<PrototypeLogEntry>();
@@ -1182,6 +1401,15 @@ namespace WorldFarm.Runtime
                     if (State.inventory[i].count <= 0)
                     {
                         State.inventory.RemoveAt(i);
+                    }
+                }
+
+                for (var i = State.stableMutationCropIds.Count - 1; i >= 0; i--)
+                {
+                    var crop = PrototypeCatalog.GetCrop(State.stableMutationCropIds[i]);
+                    if (crop == null || !crop.IsMutation || State.stableMutationCropIds.IndexOf(State.stableMutationCropIds[i]) != i)
+                    {
+                        State.stableMutationCropIds.RemoveAt(i);
                     }
                 }
 
@@ -1363,6 +1591,48 @@ namespace WorldFarm.Runtime
                     new PrototypeAffinity("cn_vegetable_bed", 0.50f),
                     new PrototypeAffinity("cn_terrace_hill", 1.20f)
                 }),
+                new PrototypeCropDef("mut_cn_drought_rice", "cn", "耐旱稻 Drought Rice", "rice", "变异谷物 Mutation Grain", 3, 11, 360, 0, "旱田适应高；回到水田会减产；稳定后自然变异关闭。", new[]
+                {
+                    new PrototypeAffinity("cn_dry_plain", 1.18f),
+                    new PrototypeAffinity("cn_paddy", 0.68f),
+                    new PrototypeAffinity("cn_vegetable_bed", 0.55f),
+                    new PrototypeAffinity("cn_terrace_hill", 0.75f)
+                }, true, "cn_rice"),
+                new PrototypeCropDef("mut_cn_water_wheat", "cn", "水麦芽 Water Wheat", "wheat", "变异谷物 Mutation Grain", 3, 8, 150, 0, "水田适应提高；回到旱田不再是最优；稳定后自然变异关闭。", new[]
+                {
+                    new PrototypeAffinity("cn_dry_plain", 0.70f),
+                    new PrototypeAffinity("cn_paddy", 1.08f),
+                    new PrototypeAffinity("cn_vegetable_bed", 0.80f),
+                    new PrototypeAffinity("cn_terrace_hill", 0.68f)
+                }, true, "cn_wheat"),
+                new PrototypeCropDef("mut_cn_marsh_corn", "cn", "湿地玉米 Marsh Corn", "corn", "变异谷物 Mutation Grain", 2, 15, 540, 0, "水田适应提高，籽粒更甜；回到旱田产量下降；稳定后自然变异关闭。", new[]
+                {
+                    new PrototypeAffinity("cn_dry_plain", 0.72f),
+                    new PrototypeAffinity("cn_paddy", 1.04f),
+                    new PrototypeAffinity("cn_vegetable_bed", 0.70f),
+                    new PrototypeAffinity("cn_terrace_hill", 0.75f)
+                }, true, "cn_corn"),
+                new PrototypeCropDef("mut_cn_mist_cabbage", "cn", "雾叶白菜 Mist Cabbage", "cabbage", "变异叶菜 Mutation Leaf", 4, 8, 120, 0, "丘陵梯田适应提高，后续可接清甜加工；稳定后自然变异关闭。", new[]
+                {
+                    new PrototypeAffinity("cn_dry_plain", 0.72f),
+                    new PrototypeAffinity("cn_paddy", 0.66f),
+                    new PrototypeAffinity("cn_vegetable_bed", 0.86f),
+                    new PrototypeAffinity("cn_terrace_hill", 1.12f)
+                }, true, "cn_cabbage"),
+                new PrototypeCropDef("mut_jp_snow_rice", "jp", "雪泉稻 Snow Spring Rice", "rice", "变异谷物 Mutation Grain", 4, 14, 420, 0, "雪融水田风土稳定品种，品质高但不适合山地；自然变异关闭。", new[]
+                {
+                    new PrototypeAffinity("jp_snow_paddy", 1.25f),
+                    new PrototypeAffinity("jp_tea_hill", 0.55f)
+                }, true, "jp_rice"),
+                new PrototypeCropDef("mut_jp_shade_tea", "jp", "影香茶 Shade Aroma Tea", "tea", "变异茶叶 Mutation Herb", 2, 30, 1800, 0, "山麓茶园风土稳定品种，清香高价；自然变异关闭。", new[]
+                {
+                    new PrototypeAffinity("jp_snow_paddy", 0.52f),
+                    new PrototypeAffinity("jp_tea_hill", 1.25f)
+                }, true, "jp_tea"),
+                new PrototypeCropDef("mut_fr_seamist_grape", "fr", "海雾葡萄 Sea Mist Grape", "grape", "变异水果 Mutation Fruit", 3, 26, 1020, 0, "波尔多海雾风土稳定品种，适合后续酒庄订单；自然变异关闭。", new[]
+                {
+                    new PrototypeAffinity("fr_bordeaux_vineyard", 1.28f)
+                }, true, "fr_grape"),
                 new PrototypeCropDef("jp_rice", "jp", "日本粳米 Japonica Rice", "rice", "谷物 Grain", 4, 10, 360, 0, "雪融水田适应高，后续可接雪泉稻。", new[]
                 {
                     new PrototypeAffinity("jp_snow_paddy", 1.20f),
@@ -1379,6 +1649,94 @@ namespace WorldFarm.Runtime
                 })
             };
 
+            public static readonly PrototypeMutationRuleDef[] MutationRules =
+            {
+                new PrototypeMutationRuleDef(
+                    "rule_cn_drought_rice",
+                    "cn_rice",
+                    "mut_cn_drought_rice",
+                    "cn_dry_plain",
+                    "耐旱稻 Drought Rice",
+                    "中国水稻在华北旱田低适应试种时，可能留下耐旱性状线索。",
+                    "clue_cn_drought_rice",
+                    "耐旱稻线索 Drought Rice Clue",
+                    2,
+                    2,
+                    0.035f),
+                new PrototypeMutationRuleDef(
+                    "rule_cn_water_wheat",
+                    "cn_wheat",
+                    "mut_cn_water_wheat",
+                    "cn_paddy",
+                    "水麦芽 Water Wheat",
+                    "中国小麦在江南水田逆境试种时，可能出现喜湿穗芽线索。",
+                    "clue_cn_water_wheat",
+                    "水麦芽线索 Water Wheat Clue",
+                    2,
+                    2,
+                    0.035f),
+                new PrototypeMutationRuleDef(
+                    "rule_cn_marsh_corn",
+                    "cn_corn",
+                    "mut_cn_marsh_corn",
+                    "cn_paddy",
+                    "湿地玉米 Marsh Corn",
+                    "中国玉米在水田中低产试种时，可能出现湿地甜粒线索。",
+                    "clue_cn_marsh_corn",
+                    "湿地玉米线索 Marsh Corn Clue",
+                    2,
+                    3,
+                    0.030f),
+                new PrototypeMutationRuleDef(
+                    "rule_cn_mist_cabbage",
+                    "cn_cabbage",
+                    "mut_cn_mist_cabbage",
+                    "cn_terrace_hill",
+                    "雾叶白菜 Mist Cabbage",
+                    "中国白菜在丘陵梯田长期试种时，可能吸收山雾风土形成清甜线索。",
+                    "clue_cn_mist_cabbage",
+                    "雾叶白菜线索 Mist Cabbage Clue",
+                    2,
+                    3,
+                    0.025f),
+                new PrototypeMutationRuleDef(
+                    "rule_jp_snow_rice",
+                    "jp_rice",
+                    "mut_jp_snow_rice",
+                    "jp_snow_paddy",
+                    "雪泉稻 Snow Spring Rice",
+                    "日本粳米在雪融水田中有小概率形成雪融风土线索。",
+                    "clue_jp_snow_rice",
+                    "雪泉稻线索 Snow Spring Rice Clue",
+                    2,
+                    3,
+                    0.045f),
+                new PrototypeMutationRuleDef(
+                    "rule_jp_shade_tea",
+                    "jp_tea",
+                    "mut_jp_shade_tea",
+                    "jp_tea_hill",
+                    "影香茶 Shade Aroma Tea",
+                    "日本茶叶在山麓茶园中有小概率形成林荫清香线索。",
+                    "clue_jp_shade_tea",
+                    "影香茶线索 Shade Tea Clue",
+                    2,
+                    4,
+                    0.045f),
+                new PrototypeMutationRuleDef(
+                    "rule_fr_seamist_grape",
+                    "fr_grape",
+                    "mut_fr_seamist_grape",
+                    "fr_bordeaux_vineyard",
+                    "海雾葡萄 Sea Mist Grape",
+                    "法国葡萄在波尔多葡萄园中有小概率形成海雾厚皮线索。",
+                    "clue_fr_seamist_grape",
+                    "海雾葡萄线索 Sea Mist Grape Clue",
+                    2,
+                    4,
+                    0.050f)
+            };
+
             public static readonly PrototypeOrderDef[] Orders =
             {
                 new PrototypeOrderDef("daily_wheat", "日常 Daily", null, 0, "基础小麦补给 Wheat Supply", "消耗短周期粮食，提供稳定金币。", 85, 8, 0, 0, 0, new[]
@@ -1389,12 +1747,12 @@ namespace WorldFarm.Runtime
                 {
                     new PrototypeRequirement("cn_cabbage", 4)
                 }),
-                new PrototypeOrderDef("cn_rice_cabbage", "中国 China", "cn", 0, "中国饭馆起步订单 Starter Meal", "推动中国声望和世界探索点的基础订单。", 180, 18, 10, 0, 14, new[]
+                new PrototypeOrderDef("cn_rice_cabbage", "中国 China", "cn", 0, "中国饭馆起步订单 Starter Meal", "推动中国声望和世界探索点的基础订单，也少量产出研究点。", 180, 18, 10, 1, 14, new[]
                 {
                     new PrototypeRequirement("cn_rice", 2),
                     new PrototypeRequirement("cn_cabbage", 2)
                 }),
-                new PrototypeOrderDef("cn_grain_supply", "中国 China", "cn", 1, "华北粮食补给 Grain Request", "解锁玉米后测试复合订单。", 250, 26, 18, 0, 20, new[]
+                new PrototypeOrderDef("cn_grain_supply", "中国 China", "cn", 1, "华北粮食补给 Grain Request", "解锁玉米后测试复合订单和早期研究点积累。", 250, 26, 18, 2, 20, new[]
                 {
                     new PrototypeRequirement("cn_wheat", 4),
                     new PrototypeRequirement("cn_corn", 1)
@@ -1403,11 +1761,19 @@ namespace WorldFarm.Runtime
                 {
                     new PrototypeRequirement("cn_tea", 2)
                 }),
-                new PrototypeOrderDef("jp_rice_order", "日本 Japan", "jp", 0, "便当米饭订单 Bento Rice", "测试新国家基础订单。", 210, 22, 12, 0, 18, new[]
+                new PrototypeOrderDef("cn_drought_rice_order", "研究 Research", "cn", 0, "耐旱稻试吃 Drought Rice Trial", "稳定变异品种的第一条经济出口。", 360, 36, 24, 4, 26, new[]
+                {
+                    new PrototypeRequirement("mut_cn_drought_rice", 2)
+                }),
+                new PrototypeOrderDef("cn_water_wheat_order", "研究 Research", "cn", 0, "水麦芽样本 Water Wheat Sample", "测试稳定变异小麦的研究价值。", 260, 28, 16, 3, 18, new[]
+                {
+                    new PrototypeRequirement("mut_cn_water_wheat", 2)
+                }),
+                new PrototypeOrderDef("jp_rice_order", "日本 Japan", "jp", 0, "便当米饭订单 Bento Rice", "测试新国家基础订单。", 210, 22, 12, 1, 18, new[]
                 {
                     new PrototypeRequirement("jp_rice", 3)
                 }),
-                new PrototypeOrderDef("fr_grape_order", "法国 France", "fr", 0, "葡萄采买订单 Grape Order", "测试法国葡萄经济线。", 260, 25, 14, 0, 20, new[]
+                new PrototypeOrderDef("fr_grape_order", "法国 France", "fr", 0, "葡萄采买订单 Grape Order", "测试法国葡萄经济线。", 260, 25, 14, 1, 20, new[]
                 {
                     new PrototypeRequirement("fr_grape", 3)
                 })
@@ -1451,6 +1817,45 @@ namespace WorldFarm.Runtime
 
                 return null;
             }
+
+            public static PrototypeMutationRuleDef GetMutationRule(string id)
+            {
+                for (var i = 0; i < MutationRules.Length; i++)
+                {
+                    if (MutationRules[i].Id == id)
+                    {
+                        return MutationRules[i];
+                    }
+                }
+
+                return null;
+            }
+
+            public static PrototypeMutationRuleDef GetMutationRuleForPlanting(string cropId, string biomeId)
+            {
+                for (var i = 0; i < MutationRules.Length; i++)
+                {
+                    if (MutationRules[i].BaseCropId == cropId && MutationRules[i].TriggerBiomeId == biomeId)
+                    {
+                        return MutationRules[i];
+                    }
+                }
+
+                return null;
+            }
+
+            public static PrototypeMutationRuleDef GetMutationRuleByClueItem(string clueItemId)
+            {
+                for (var i = 0; i < MutationRules.Length; i++)
+                {
+                    if (MutationRules[i].ClueItemId == clueItemId)
+                    {
+                        return MutationRules[i];
+                    }
+                }
+
+                return null;
+            }
         }
 
         private static class PrototypeBalance
@@ -1477,7 +1882,12 @@ namespace WorldFarm.Runtime
                 var growthMultiplier = 1f + stress * 0.6f;
                 var minYield = Mathf.Max(1, Mathf.RoundToInt(crop.BaseYield * yieldMultiplier * 0.85f));
                 var maxYield = Mathf.Max(1, Mathf.RoundToInt(crop.BaseYield * yieldMultiplier * 1.15f));
-                var mutationChance = Mathf.Clamp(0.002f + stress * stress * 0.08f, 0f, 0.12f);
+                var mutationRule = PrototypeCatalog.GetMutationRuleForPlanting(crop.Id, biome.Id);
+                var mutationChance = 0f;
+                if (crop.NaturalMutationEnabled && mutationRule != null)
+                {
+                    mutationChance = Mathf.Clamp(0.01f + stress * stress * 0.20f + mutationRule.ChanceBonus, 0f, 0.28f);
+                }
 
                 return new PrototypeBalanceResult
                 {
@@ -1497,6 +1907,47 @@ namespace WorldFarm.Runtime
             public int minYield;
             public int maxYield;
             public float mutationChance;
+        }
+
+        private sealed class PrototypeMutationRuleDef
+        {
+            public readonly string Id;
+            public readonly string BaseCropId;
+            public readonly string ResultCropId;
+            public readonly string TriggerBiomeId;
+            public readonly string DisplayName;
+            public readonly string Description;
+            public readonly string ClueItemId;
+            public readonly string ClueDisplayName;
+            public readonly int RequiredClueCount;
+            public readonly int RequiredResearchPoints;
+            public readonly float ChanceBonus;
+
+            public PrototypeMutationRuleDef(
+                string id,
+                string baseCropId,
+                string resultCropId,
+                string triggerBiomeId,
+                string displayName,
+                string description,
+                string clueItemId,
+                string clueDisplayName,
+                int requiredClueCount,
+                int requiredResearchPoints,
+                float chanceBonus)
+            {
+                Id = id;
+                BaseCropId = baseCropId;
+                ResultCropId = resultCropId;
+                TriggerBiomeId = triggerBiomeId;
+                DisplayName = displayName;
+                Description = description;
+                ClueItemId = clueItemId;
+                ClueDisplayName = clueDisplayName;
+                RequiredClueCount = requiredClueCount;
+                RequiredResearchPoints = requiredResearchPoints;
+                ChanceBonus = chanceBonus;
+            }
         }
 
         private sealed class PrototypeCountryDef
@@ -1549,6 +2000,9 @@ namespace WorldFarm.Runtime
             public readonly int GrowthSeconds;
             public readonly int RequiredReputationLevel;
             public readonly string MutationHint;
+            public readonly bool IsMutation;
+            public readonly string ParentCropId;
+            public readonly bool NaturalMutationEnabled;
             private readonly PrototypeAffinity[] affinities;
 
             public PrototypeCropDef(
@@ -1562,7 +2016,9 @@ namespace WorldFarm.Runtime
                 int growthSeconds,
                 int requiredReputationLevel,
                 string mutationHint,
-                PrototypeAffinity[] affinities)
+                PrototypeAffinity[] affinities,
+                bool isMutation = false,
+                string parentCropId = "")
             {
                 Id = id;
                 CountryId = countryId;
@@ -1574,6 +2030,9 @@ namespace WorldFarm.Runtime
                 GrowthSeconds = growthSeconds;
                 RequiredReputationLevel = requiredReputationLevel;
                 MutationHint = mutationHint;
+                IsMutation = isMutation;
+                ParentCropId = parentCropId;
+                NaturalMutationEnabled = !isMutation;
                 this.affinities = affinities;
             }
 
