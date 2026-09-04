@@ -640,11 +640,11 @@ namespace WorldFarm.Editor
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color(0.70f, 0.86f, 0.92f);
             camera.orthographic = true;
-            camera.orthographicSize = 5.55f;
+            camera.orthographicSize = 7.15f;
             camera.nearClipPlane = 0.1f;
             camera.farClipPlane = 120f;
-            camera.transform.position = new Vector3(0f, 7.8f, -7.6f);
-            camera.transform.rotation = Quaternion.LookRotation(new Vector3(0f, 0.1f, 0f) - camera.transform.position, Vector3.up);
+            camera.transform.position = new Vector3(0f, 9.2f, -7.3f);
+            camera.transform.rotation = Quaternion.LookRotation(new Vector3(0f, 0.05f, 0f) - camera.transform.position, Vector3.up);
 
             var keyLightObject = GameObject.Find("Prototype 3D Key Light") ?? GameObject.Find("Directional Light") ?? new GameObject("Prototype 3D Key Light");
             keyLightObject.name = "Prototype 3D Key Light";

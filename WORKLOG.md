@@ -193,6 +193,26 @@ Build/runtime notes:
 - Built Android development APK at `Builds/Android/WorldFarm-prototype-3d.apk`.
 - This APK is intentionally committed for this handoff even though build outputs are normally ignored.
 
+### M0.2.1 3D Placeholder Layout And Touch Fix
+
+Fixed the first 3D placeholder APK layout pass after mobile review.
+
+Changes:
+
+- Replaced fixed world-coordinate placement with safe-area and aspect-ratio based layout anchors.
+- Split the screen into stable regions: top status, left country rail, center biome plots, right seed selector, lower system buildings, and bottom log board.
+- Shortened and wrapped TextMesh labels so long inventory/order/status text cannot run across neighboring regions.
+- Removed most empty plot labels and kept only short crop maturity labels.
+- Added larger transparent tap pads around warehouse, order board, and mutation shed.
+- Added direct one-finger touch handling with DPI-aware tap threshold.
+- Changed 3D raycast handling to scan all hits and pick the first actual click target, so ground/decorations do not swallow taps.
+- Added a simple feedback log when tapping biome tiles.
+
+Verification:
+
+- Tuanjie batch Bootstrap completed without C# compiler errors.
+- Android development APK rebuilt successfully at `Builds/Android/WorldFarm-prototype-3d.apk`.
+
 ### Notes For Continuing On Another Computer
 
 - Pull the repository.

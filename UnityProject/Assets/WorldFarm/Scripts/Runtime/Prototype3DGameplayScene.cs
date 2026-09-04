@@ -17,11 +17,14 @@ namespace WorldFarm.Runtime
 
         private Camera sceneCamera;
         private Transform generatedRoot;
+        private Prototype3DLayout layout;
         private Prototype3DMaterials materials;
         private bool pointerDown;
         private bool needsRebuild;
         private bool pinchZooming;
         private int selectedOrderIndex;
+        private int lastScreenWidth;
+        private int lastScreenHeight;
         private float nextRefreshTime;
         private float pinchStartDistance;
         private float pinchStartSize;
@@ -47,6 +50,12 @@ namespace WorldFarm.Runtime
             }
 
             HandleInput();
+
+            if (Screen.width != lastScreenWidth || Screen.height != lastScreenHeight)
+            {
+                ConfigureCameraForScreen();
+                needsRebuild = true;
+            }
 
             if (needsRebuild)
             {
@@ -76,11 +85,9 @@ namespace WorldFarm.Runtime
             sceneCamera.clearFlags = CameraClearFlags.SolidColor;
             sceneCamera.backgroundColor = new Color(0.70f, 0.86f, 0.92f);
             sceneCamera.orthographic = true;
-            sceneCamera.orthographicSize = 5.55f;
             sceneCamera.nearClipPlane = 0.1f;
             sceneCamera.farClipPlane = 120f;
-            sceneCamera.transform.position = new Vector3(0f, 7.8f, -7.6f);
-            sceneCamera.transform.rotation = Quaternion.LookRotation(new Vector3(0f, 0.1f, 0f) - sceneCamera.transform.position, Vector3.up);
+            ConfigureCameraForScreen();
 
             RenderSettings.ambientMode = AmbientMode.Trilight;
             RenderSettings.ambientSkyColor = new Color(0.92f, 0.96f, 0.98f);
@@ -118,11 +125,33 @@ namespace WorldFarm.Runtime
             fillLightObject.transform.position = new Vector3(-3.4f, 3.8f, -3.4f);
         }
 
+        private void ConfigureCameraForScreen()
+        {
+            if (sceneCamera == null)
+            {
+                return;
+            }
+
+            var width = Mathf.Max(1, Screen.width);
+            var height = Mathf.Max(1, Screen.height);
+            var aspect = width / (float)height;
+            var narrowPortrait = aspect < 0.72f;
+
+            sceneCamera.orthographic = true;
+            sceneCamera.orthographicSize = narrowPortrait ? 7.15f : 6.25f;
+            sceneCamera.transform.position = new Vector3(0f, 9.2f, -7.3f);
+            sceneCamera.transform.rotation = Quaternion.LookRotation(new Vector3(0f, 0.05f, 0f) - sceneCamera.transform.position, Vector3.up);
+
+            lastScreenWidth = width;
+            lastScreenHeight = height;
+        }
+
         private void BuildScene()
         {
             needsRebuild = false;
             labels.Clear();
             materials = new Prototype3DMaterials();
+            layout = new Prototype3DLayout(sceneCamera);
 
             var oldRoot = GameObject.Find(GeneratedRootName);
             if (oldRoot != null)
@@ -147,53 +176,58 @@ namespace WorldFarm.Runtime
 
         private void BuildGround()
         {
-            AddBox("World Grass Base", new Vector3(0f, -0.08f, -0.15f), new Vector3(5.85f, 0.12f, 8.7f), materials.Grass, null, null);
-            AddBox("Back Hill Band", new Vector3(0f, -0.02f, 4.0f), new Vector3(5.85f, 0.10f, 0.45f), materials.Hill, null, null);
-            AddCylinder("Sun Token", new Vector3(-2.65f, 0.35f, 3.95f), 0.22f, 0.06f, materials.Sun, null, null);
+            AddBox("World Grass Base", layout.Point(0.50f, 0.49f, -0.08f), layout.Size(0.96f, 0.12f, 0.90f), materials.Grass, null, null);
+            AddBox("Back Hill Band", layout.Point(0.50f, 0.88f, -0.02f), layout.Size(0.96f, 0.10f, 0.07f), materials.Hill, null, null);
+            AddCylinder("Sun Token", layout.Point(0.09f, 0.90f, 0.30f), layout.SmallRadius(0.030f), 0.06f, materials.Sun, null, null);
         }
 
         private void BuildStatusBar()
         {
-            AddBox("Top HUD Board", new Vector3(0f, 0.22f, 3.35f), new Vector3(5.55f, 0.12f, 0.70f), materials.Panel, null, null);
+            AddBox("Top HUD Board", layout.Point(0.50f, 0.955f, 0.18f), layout.Size(0.90f, 0.12f, 0.060f), materials.Panel, null, null);
             AddLabel(
                 "WorldFarm 3D占位版\n" +
                 "金币 " + game.State.coins +
-                "  探索 " + game.State.worldExplorationPoints +
-                "  研究 " + game.State.researchPoints +
-                "  " + game.GetSelectedCountry().DisplayName +
-                " Lv." + game.GetCountryLevel(game.State.selectedCountryId),
-                new Vector3(0f, 0.70f, 3.35f),
-                0.054f,
-                materials.TextDark.color);
+                " 探索 " + game.State.worldExplorationPoints +
+                " 研究 " + game.State.researchPoints +
+                "  " + game.GetSelectedCountry().ShortName +
+                "Lv." + game.GetCountryLevel(game.State.selectedCountryId),
+                layout.Point(0.50f, 0.955f, 0.56f),
+                layout.Text(0.044f),
+                materials.TextDark.color,
+                18,
+                2);
         }
 
         private void BuildCountryRail()
         {
-            AddLabel("国家", new Vector3(-2.45f, 0.38f, 2.66f), 0.056f, materials.TextDark.color);
+            AddLabel("国家", layout.Point(0.13f, 0.855f, 0.38f), layout.Text(0.046f), materials.TextDark.color);
 
             var countries = Prototype3DCatalog.Countries;
             for (var index = 0; index < countries.Length; index++)
             {
                 var country = countries[index];
-                var z = 2.25f - index * 0.55f;
+                var y = 0.795f - index * 0.075f;
                 var unlocked = game.IsCountryUnlocked(country.Id);
                 var selected = country.Id == game.State.selectedCountryId;
                 var canUnlock = !unlocked && game.State.worldExplorationPoints >= country.RequiredExplorationPoints;
                 var material = selected ? materials.Selected : unlocked ? materials.CountryOpen : canUnlock ? materials.Warning : materials.Locked;
+                var center = layout.Point(0.13f, y, 0.16f);
 
-                AddBox("Country " + country.Id, new Vector3(-2.46f, 0.16f, z), new Vector3(0.86f, 0.18f, 0.38f), material, "country", country.Id);
+                AddBox("Country " + country.Id, center, layout.Size(0.205f, 0.18f, 0.055f), material, "country", country.Id);
                 AddLabel(
                     (selected ? ">" : string.Empty) + country.ShortName + "\n" + (unlocked ? "Lv." + game.GetCountryLevel(country.Id) : "需" + country.RequiredExplorationPoints),
-                    new Vector3(-2.46f, 0.50f, z),
-                    0.040f,
-                    unlocked || canUnlock ? materials.TextDark.color : materials.TextMuted.color);
+                    layout.Point(0.13f, y, 0.50f),
+                    layout.Text(0.034f),
+                    unlocked || canUnlock ? materials.TextDark.color : materials.TextMuted.color,
+                    8,
+                    2);
             }
         }
 
         private void BuildBiomeMap()
         {
             var country = game.GetSelectedCountry();
-            AddLabel(country.ShortName + "地貌", new Vector3(-0.25f, 0.38f, 2.58f), 0.056f, materials.TextDark.color);
+            AddLabel(country.ShortName + "地貌", layout.Point(0.50f, 0.845f, 0.38f), layout.Text(0.046f), materials.TextDark.color);
 
             var biomes = game.GetSelectedCountryBiomes();
             for (var i = 0; i < biomes.Count; i++)
@@ -201,50 +235,50 @@ namespace WorldFarm.Runtime
                 var biome = biomes[i];
                 var gridX = i % 2;
                 var gridZ = i / 2;
-                var center = new Vector3(-0.88f + gridX * 1.34f, 0.03f, 1.82f - gridZ * 1.43f);
+                var viewportX = 0.405f + gridX * 0.205f;
+                var viewportY = 0.735f - gridZ * 0.145f;
+                var center = layout.Point(viewportX, viewportY, 0.03f);
                 var unlocked = game.IsBiomeUnlocked(biome.Id);
                 var material = unlocked ? materials.GetBiomeMaterial(biome.Id) : materials.Locked;
 
-                AddBox("Biome " + biome.Id, center, new Vector3(1.16f, 0.12f, 1.10f), material, unlocked ? "biome" : null, biome.Id);
+                AddBox("Biome " + biome.Id, center, layout.Size(0.185f, 0.12f, 0.110f), material, unlocked ? "biome" : null, biome.Id);
                 AddLabel(
                     biome.ShortName + "\n" + (unlocked ? "槽位" + biome.SlotCount : "声望Lv." + biome.RequiredReputationLevel),
-                    center + new Vector3(0f, 0.46f, 0.35f),
-                    0.035f,
-                    unlocked ? materials.TextDark.color : materials.TextMuted.color);
+                    layout.Point(viewportX, viewportY + 0.040f, 0.45f),
+                    layout.Text(0.031f),
+                    unlocked ? materials.TextDark.color : materials.TextMuted.color,
+                    7,
+                    2);
 
                 if (biome.Id.Contains("paddy"))
                 {
-                    AddBox("Paddy Water " + biome.Id, center + new Vector3(0f, 0.10f, -0.08f), new Vector3(0.96f, 0.035f, 0.56f), materials.Water, null, null);
+                    AddBox("Paddy Water " + biome.Id, layout.Point(viewportX, viewportY - 0.012f, 0.10f), layout.Size(0.145f, 0.035f, 0.050f), materials.Water, null, null);
                 }
 
-                BuildPlotsForBiome(biome, center, unlocked);
+                BuildPlotsForBiome(biome, viewportX, viewportY, unlocked);
             }
         }
 
-        private void BuildPlotsForBiome(Prototype3DBiomeDef biome, Vector3 center, bool unlocked)
+        private void BuildPlotsForBiome(Prototype3DBiomeDef biome, float viewportX, float viewportY, bool unlocked)
         {
             var plots = game.GetPlotsForBiome(biome.Id);
             for (var i = 0; i < plots.Count; i++)
             {
                 var local = GetSlotOffset(i, plots.Count);
-                var position = center + local;
+                var position = layout.Point(viewportX + local.x, viewportY + local.z, 0.16f);
                 var plot = plots[i];
                 var padMaterial = !unlocked ? materials.Locked : plot.status == Prototype3DPlotStatus.Mature ? materials.MaturePad : plot.status == Prototype3DPlotStatus.Growing ? materials.GrowingPad : materials.EmptyPad;
 
-                AddCylinder("Plot " + plot.plotId, position + new Vector3(0f, 0.16f, 0f), 0.19f, 0.05f, padMaterial, unlocked ? "plot" : null, plot.plotId);
+                AddCylinder("Plot " + plot.plotId, position, layout.SmallRadius(0.028f), 0.06f, padMaterial, unlocked ? "plot" : null, plot.plotId);
 
                 if (plot.status != Prototype3DPlotStatus.Empty)
                 {
-                    AddCropModel(plot.cropId, position + new Vector3(0f, 0.24f, 0f), 0.34f, "plot", plot.plotId);
+                    AddCropModel(plot.cropId, position + new Vector3(0f, 0.12f, 0f), layout.CropScale(0.34f), "plot", plot.plotId);
                     AddLabel(
-                        plot.status == Prototype3DPlotStatus.Mature ? "成熟" : FormatShortDuration(Math.Max(0, plot.matureAtSeconds - game.NowSeconds)),
-                        position + new Vector3(0f, 0.74f, -0.06f),
-                        0.026f,
+                        plot.status == Prototype3DPlotStatus.Mature ? "成熟" : FormatShortDuration(Math.Max(0L, plot.matureAtSeconds - game.NowSeconds)),
+                        position + new Vector3(0f, 0.42f, 0f),
+                        layout.Text(0.022f),
                         plot.status == Prototype3DPlotStatus.Mature ? materials.TextStrong.color : materials.TextDark.color);
-                }
-                else if (unlocked)
-                {
-                    AddLabel("空", position + new Vector3(0f, 0.42f, 0f), 0.026f, materials.TextMuted.color);
                 }
             }
         }
@@ -253,75 +287,79 @@ namespace WorldFarm.Runtime
         {
             if (count <= 1)
             {
-                return new Vector3(0f, 0f, -0.20f);
+                return new Vector3(0f, 0f, -0.020f);
             }
 
             if (count == 2)
             {
-                return new Vector3(index == 0 ? -0.26f : 0.26f, 0f, -0.22f);
+                return new Vector3(index == 0 ? -0.040f : 0.040f, 0f, -0.020f);
             }
 
             if (count == 3)
             {
-                return new Vector3((index - 1) * 0.28f, 0f, -0.22f);
+                return new Vector3((index - 1) * 0.040f, 0f, -0.020f);
             }
 
-            return new Vector3(index % 2 == 0 ? -0.26f : 0.26f, 0f, index < 2 ? -0.06f : -0.40f);
+            return new Vector3(index % 2 == 0 ? -0.040f : 0.040f, 0f, index < 2 ? 0.000f : -0.045f);
         }
 
         private void BuildSeedRack()
         {
             var crop = game.GetSelectedCrop();
-            AddBox("Seed Rack", new Vector3(2.36f, 0.18f, 1.50f), new Vector3(0.92f, 0.20f, 1.78f), materials.Wood, null, null);
-            AddLabel("种子架", new Vector3(2.36f, 0.64f, 2.23f), 0.052f, materials.TextDark.color);
+            AddBox("Seed Rack", layout.Point(0.86f, 0.735f, 0.18f), layout.Size(0.210f, 0.20f, 0.235f), materials.Wood, null, null);
+            AddLabel("种子", layout.Point(0.86f, 0.845f, 0.50f), layout.Text(0.046f), materials.TextDark.color);
 
-            AddCylinder("Selected Seed Pedestal", new Vector3(2.36f, 0.36f, 1.52f), 0.33f, 0.10f, materials.Panel, "cycle_crop", string.Empty);
+            AddCylinder("Selected Seed Pedestal", layout.Point(0.86f, 0.750f, 0.33f), layout.SmallRadius(0.045f), 0.12f, materials.Panel, "cycle_crop", string.Empty);
             if (crop != null)
             {
-                AddCropModel(crop.Id, new Vector3(2.36f, 0.48f, 1.52f), 0.58f, "cycle_crop", string.Empty);
-                AddLabel((crop.IsMutation ? "变异\n" : string.Empty) + crop.ShortName, new Vector3(2.36f, 1.18f, 1.52f), 0.040f, materials.TextDark.color);
+                AddCropModel(crop.Id, layout.Point(0.86f, 0.750f, 0.44f), layout.CropScale(0.54f), "cycle_crop", string.Empty);
+                AddLabel((crop.IsMutation ? "变异\n" : string.Empty) + crop.ShortName, layout.Point(0.86f, 0.655f, 0.50f), layout.Text(0.033f), materials.TextDark.color, 6, 2);
             }
 
-            AddBox("Prev Crop Button", new Vector3(2.08f, 0.36f, 0.66f), new Vector3(0.34f, 0.16f, 0.32f), materials.Button, "prev_crop", string.Empty);
-            AddLabel("上个", new Vector3(2.08f, 0.66f, 0.66f), 0.032f, materials.TextDark.color);
-            AddBox("Next Crop Button", new Vector3(2.64f, 0.36f, 0.66f), new Vector3(0.34f, 0.16f, 0.32f), materials.Button, "next_crop", string.Empty);
-            AddLabel("下个", new Vector3(2.64f, 0.66f, 0.66f), 0.032f, materials.TextDark.color);
+            AddBox("Prev Crop Button", layout.Point(0.805f, 0.590f, 0.28f), layout.Size(0.090f, 0.18f, 0.055f), materials.Button, "prev_crop", string.Empty);
+            AddLabel("上", layout.Point(0.805f, 0.590f, 0.58f), layout.Text(0.032f), materials.TextDark.color);
+            AddBox("Next Crop Button", layout.Point(0.915f, 0.590f, 0.28f), layout.Size(0.090f, 0.18f, 0.055f), materials.Button, "next_crop", string.Empty);
+            AddLabel("下", layout.Point(0.915f, 0.590f, 0.58f), layout.Text(0.032f), materials.TextDark.color);
 
             var biome = game.GetSelectedBiomeForCropPreview();
             if (biome != null && crop != null)
             {
                 var balance = Prototype3DBalance.Calculate(biome, crop);
-                AddLabel("适应 " + balance.adaptation.ToString("0.00") + "\n变异 " + (balance.mutationChance * 100f).ToString("0") + "%", new Vector3(2.36f, 0.66f, -0.03f), 0.032f, materials.TextMuted.color);
+                AddLabel("适应" + balance.adaptation.ToString("0.00") + "\n变异" + (balance.mutationChance * 100f).ToString("0") + "%", layout.Point(0.86f, 0.525f, 0.50f), layout.Text(0.030f), materials.TextMuted.color, 8, 2);
             }
         }
 
         private void BuildSystemBuildings()
         {
-            BuildWarehouse(new Vector3(-2.18f, 0f, -2.72f));
-            BuildOrderBoard(new Vector3(0f, 0f, -2.72f));
-            BuildMutationLab(new Vector3(2.18f, 0f, -2.72f));
+            BuildWarehouse(0.20f, 0.225f);
+            BuildOrderBoard(0.50f, 0.225f);
+            BuildMutationLab(0.80f, 0.225f);
         }
 
-        private void BuildWarehouse(Vector3 origin)
+        private void BuildWarehouse(float viewportX, float viewportY)
         {
-            AddBox("Warehouse Body", origin + new Vector3(0f, 0.45f, 0f), new Vector3(0.72f, 0.70f, 0.62f), materials.Warehouse, "warehouse", string.Empty);
-            AddBox("Warehouse Roof", origin + new Vector3(0f, 0.88f, 0f), new Vector3(0.88f, 0.18f, 0.74f), materials.RoofRed, "warehouse", string.Empty);
-            AddBox("Warehouse Door", origin + new Vector3(0f, 0.28f, -0.33f), new Vector3(0.30f, 0.36f, 0.05f), materials.Door, "warehouse", string.Empty);
-            AddLabel("仓库", origin + new Vector3(0f, 1.25f, 0f), 0.050f, materials.TextDark.color);
-            AddLabel(game.GetInventorySummary(), origin + new Vector3(0f, 0.18f, -0.88f), 0.029f, materials.TextDark.color);
+            var origin = layout.Point(viewportX, viewportY, 0f);
+            AddBox("Warehouse Tap Pad", layout.Point(viewportX, viewportY, 0.05f), layout.Size(0.245f, 0.08f, 0.125f), materials.ClearTap, "warehouse", string.Empty);
+            AddBox("Warehouse Body", origin + new Vector3(0f, 0.42f, 0f), layout.Scale(new Vector3(0.72f, 0.66f, 0.56f)), materials.Warehouse, "warehouse", string.Empty);
+            AddBox("Warehouse Roof", origin + new Vector3(0f, 0.80f, 0f), layout.Scale(new Vector3(0.88f, 0.18f, 0.66f)), materials.RoofRed, "warehouse", string.Empty);
+            AddBox("Warehouse Door", origin + new Vector3(0f, 0.25f, -0.26f), layout.Scale(new Vector3(0.30f, 0.32f, 0.05f)), materials.Door, "warehouse", string.Empty);
+            AddLabel("仓库", layout.Point(viewportX, viewportY + 0.070f, 0.78f), layout.Text(0.044f), materials.TextDark.color);
+            AddLabel(game.GetInventorySummary(), layout.Point(viewportX, viewportY - 0.070f, 0.48f), layout.Text(0.026f), materials.TextDark.color, 9, 2);
         }
 
-        private void BuildOrderBoard(Vector3 origin)
+        private void BuildOrderBoard(float viewportX, float viewportY)
         {
-            AddCylinder("Order Post L", origin + new Vector3(-0.36f, 0.42f, 0f), 0.035f, 0.65f, materials.Door, "order", string.Empty);
-            AddCylinder("Order Post R", origin + new Vector3(0.36f, 0.42f, 0f), 0.035f, 0.65f, materials.Door, "order", string.Empty);
-            AddBox("Order Board", origin + new Vector3(0f, 0.82f, -0.02f), new Vector3(0.90f, 0.52f, 0.10f), materials.OrderBoard, "order", string.Empty);
-            AddLabel("订单牌", origin + new Vector3(0f, 1.25f, -0.02f), 0.048f, materials.TextDark.color);
+            var origin = layout.Point(viewportX, viewportY, 0f);
+            AddBox("Order Tap Pad", layout.Point(viewportX, viewportY, 0.05f), layout.Size(0.260f, 0.08f, 0.125f), materials.ClearTap, "order", string.Empty);
+            AddCylinder("Order Post L", origin + new Vector3(-layout.WorldWidth(0.055f), 0.40f, 0f), layout.SmallRadius(0.007f), 0.60f, materials.Door, "order", string.Empty);
+            AddCylinder("Order Post R", origin + new Vector3(layout.WorldWidth(0.055f), 0.40f, 0f), layout.SmallRadius(0.007f), 0.60f, materials.Door, "order", string.Empty);
+            AddBox("Order Board", origin + new Vector3(0f, 0.76f, -0.02f), layout.Scale(new Vector3(0.88f, 0.50f, 0.10f)), materials.OrderBoard, "order", string.Empty);
+            AddLabel("订单牌", layout.Point(viewportX, viewportY + 0.070f, 0.78f), layout.Text(0.042f), materials.TextDark.color);
 
             var orders = game.GetVisibleOrders();
             if (orders.Count == 0)
             {
-                AddLabel("暂无订单", origin + new Vector3(0f, 0.84f, -0.25f), 0.030f, materials.TextDark.color);
+                AddLabel("暂无订单", layout.Point(viewportX, viewportY, 0.70f), layout.Text(0.028f), materials.TextDark.color);
                 return;
             }
 
@@ -329,55 +367,61 @@ namespace WorldFarm.Runtime
             var order = orders[selectedOrderIndex];
             var canSubmit = game.CanSubmitOrder(order);
             AddLabel(
-                order.ShortName + "\n需 " + game.FormatRequirements(order) + "\n奖 金" + order.RewardCoins + " 研" + order.RewardResearchPoints,
-                origin + new Vector3(0f, 0.76f, -0.28f),
-                0.028f,
-                canSubmit ? materials.TextStrong.color : materials.TextDark.color);
-            AddBox("Order Submit Button", origin + new Vector3(0f, 0.24f, -0.62f), new Vector3(0.78f, 0.16f, 0.30f), canSubmit ? materials.Button : materials.Locked, "order", string.Empty);
-            AddLabel(canSubmit ? "提交" : "缺货", origin + new Vector3(0f, 0.53f, -0.62f), 0.034f, canSubmit ? materials.TextDark.color : materials.TextMuted.color);
+                order.ShortName + "\n需 " + game.FormatRequirements(order),
+                layout.Point(viewportX, viewportY - 0.005f, 0.66f),
+                layout.Text(0.025f),
+                canSubmit ? materials.TextStrong.color : materials.TextDark.color,
+                9,
+                2);
+            AddBox("Order Submit Button", layout.Point(viewportX, viewportY - 0.082f, 0.18f), layout.Size(0.185f, 0.18f, 0.052f), canSubmit ? materials.Button : materials.Locked, "order", string.Empty);
+            AddLabel(canSubmit ? "提交" : "缺货", layout.Point(viewportX, viewportY - 0.082f, 0.50f), layout.Text(0.032f), canSubmit ? materials.TextDark.color : materials.TextMuted.color);
         }
 
-        private void BuildMutationLab(Vector3 origin)
+        private void BuildMutationLab(float viewportX, float viewportY)
         {
-            AddBox("Mutation Lab Base", origin + new Vector3(0f, 0.38f, 0f), new Vector3(0.72f, 0.54f, 0.62f), materials.MutationLab, "mutation", string.Empty);
-            AddCylinder("Mutation Lab Dome", origin + new Vector3(0f, 0.78f, 0f), 0.36f, 0.18f, materials.Glass, "mutation", string.Empty);
-            AddCylinder("Mutation Crystal", origin + new Vector3(0f, 1.02f, -0.08f), 0.10f, 0.30f, materials.MutationCrystal, "mutation", string.Empty);
-            AddLabel("变异棚", origin + new Vector3(0f, 1.30f, 0f), 0.050f, materials.TextDark.color);
+            var origin = layout.Point(viewportX, viewportY, 0f);
+            AddBox("Mutation Tap Pad", layout.Point(viewportX, viewportY, 0.05f), layout.Size(0.245f, 0.08f, 0.125f), materials.ClearTap, "mutation", string.Empty);
+            AddBox("Mutation Lab Base", origin + new Vector3(0f, 0.36f, 0f), layout.Scale(new Vector3(0.70f, 0.52f, 0.56f)), materials.MutationLab, "mutation", string.Empty);
+            AddCylinder("Mutation Lab Dome", origin + new Vector3(0f, 0.72f, 0f), layout.SmallRadius(0.047f), 0.18f, materials.Glass, "mutation", string.Empty);
+            AddCylinder("Mutation Crystal", origin + new Vector3(0f, 0.96f, -0.06f), layout.SmallRadius(0.014f), 0.28f, materials.MutationCrystal, "mutation", string.Empty);
+            AddLabel("变异棚", layout.Point(viewportX, viewportY + 0.070f, 0.82f), layout.Text(0.042f), materials.TextDark.color);
 
             var rule = game.GetFocusedMutationRule();
             if (rule == null)
             {
-                AddLabel("暂无规则", origin + new Vector3(0f, 0.28f, -0.86f), 0.030f, materials.TextDark.color);
+                AddLabel("暂无规则", layout.Point(viewportX, viewportY - 0.060f, 0.48f), layout.Text(0.028f), materials.TextDark.color);
                 return;
             }
 
             var stable = game.IsMutationCropUnlocked(rule.ResultCropId);
             AddLabel(
-                rule.ShortName + "\n线索 " + game.GetInventoryCount(rule.ClueItemId) + "/" + rule.RequiredClueCount + "  研究 " + game.State.researchPoints + "/" + rule.RequiredResearchPoints,
-                origin + new Vector3(0f, 0.25f, -0.90f),
-                0.029f,
-                stable ? materials.TextStrong.color : materials.TextDark.color);
+                rule.ShortName + "\n线索" + game.GetInventoryCount(rule.ClueItemId) + "/" + rule.RequiredClueCount + " 研" + game.State.researchPoints + "/" + rule.RequiredResearchPoints,
+                layout.Point(viewportX, viewportY - 0.015f, 0.58f),
+                layout.Text(0.025f),
+                stable ? materials.TextStrong.color : materials.TextDark.color,
+                9,
+                2);
 
-            AddBox("Mutation Main Button", origin + new Vector3(0f, 0.24f, -1.28f), new Vector3(0.84f, 0.16f, 0.30f), stable ? materials.Selected : materials.Button, "mutation", string.Empty);
-            AddLabel(stable ? "已稳定" : game.CanStabilizeMutation(rule) ? "稳定" : "加线索", origin + new Vector3(0f, 0.53f, -1.28f), 0.034f, materials.TextDark.color);
+            AddBox("Mutation Main Button", layout.Point(viewportX, viewportY - 0.082f, 0.18f), layout.Size(0.185f, 0.18f, 0.052f), stable ? materials.Selected : materials.Button, "mutation", string.Empty);
+            AddLabel(stable ? "已稳定" : game.CanStabilizeMutation(rule) ? "稳定" : "线索", layout.Point(viewportX, viewportY - 0.082f, 0.50f), layout.Text(0.032f), materials.TextDark.color);
         }
 
         private void BuildTimeControls()
         {
-            AddBox("Time Button 10m", new Vector3(-1.34f, 0.18f, -4.02f), new Vector3(0.86f, 0.18f, 0.42f), materials.Button, "time10", string.Empty);
-            AddLabel("+10分", new Vector3(-1.34f, 0.52f, -4.02f), 0.040f, materials.TextDark.color);
+            AddBox("Time Button 10m", layout.Point(0.27f, 0.380f, 0.18f), layout.Size(0.170f, 0.18f, 0.055f), materials.Button, "time10", string.Empty);
+            AddLabel("+10分", layout.Point(0.27f, 0.380f, 0.50f), layout.Text(0.034f), materials.TextDark.color);
 
-            AddBox("Mature All Button", new Vector3(0f, 0.18f, -4.02f), new Vector3(0.94f, 0.18f, 0.42f), materials.Button, "mature_all", string.Empty);
-            AddLabel("全成熟", new Vector3(0f, 0.52f, -4.02f), 0.040f, materials.TextDark.color);
+            AddBox("Mature All Button", layout.Point(0.50f, 0.380f, 0.18f), layout.Size(0.180f, 0.18f, 0.055f), materials.Button, "mature_all", string.Empty);
+            AddLabel("全成熟", layout.Point(0.50f, 0.380f, 0.50f), layout.Text(0.034f), materials.TextDark.color);
 
-            AddBox("Reset Button", new Vector3(1.34f, 0.18f, -4.02f), new Vector3(0.86f, 0.18f, 0.42f), materials.Warning, "reset", string.Empty);
-            AddLabel("重置", new Vector3(1.34f, 0.52f, -4.02f), 0.040f, materials.TextDark.color);
+            AddBox("Reset Button", layout.Point(0.73f, 0.380f, 0.18f), layout.Size(0.170f, 0.18f, 0.055f), materials.Warning, "reset", string.Empty);
+            AddLabel("重置", layout.Point(0.73f, 0.380f, 0.50f), layout.Text(0.034f), materials.TextDark.color);
         }
 
         private void BuildLogBoard()
         {
-            AddBox("Log Board", new Vector3(0f, 0.12f, -4.62f), new Vector3(5.45f, 0.10f, 0.34f), materials.Panel, null, null);
-            AddLabel(game.GetLatestLog(), new Vector3(0f, 0.40f, -4.62f), 0.030f, materials.TextDark.color);
+            AddBox("Log Board", layout.Point(0.50f, 0.055f, 0.10f), layout.Size(0.90f, 0.10f, 0.055f), materials.Panel, null, null);
+            AddLabel(game.GetLatestLog(), layout.Point(0.50f, 0.055f, 0.38f), layout.Text(0.027f), materials.TextDark.color, 20, 2);
         }
 
         private void AddCropModel(string cropId, Vector3 position, float scale, string clickKind, string clickId)
@@ -502,18 +546,19 @@ namespace WorldFarm.Runtime
             target.Id = clickId;
         }
 
-        private TextMesh AddLabel(string text, Vector3 position, float characterSize, Color color)
+        private TextMesh AddLabel(string text, Vector3 position, float characterSize, Color color, int maxCharsPerLine = 0, int maxLines = 0)
         {
             var labelObject = new GameObject("Label " + text.Replace("\n", " "));
             labelObject.transform.SetParent(generatedRoot, false);
             labelObject.transform.localPosition = position;
 
             var textMesh = labelObject.AddComponent<TextMesh>();
-            textMesh.text = text;
+            textMesh.text = CompactLabelText(text, maxCharsPerLine, maxLines);
             textMesh.fontSize = 88;
             textMesh.characterSize = characterSize;
             textMesh.anchor = TextAnchor.MiddleCenter;
             textMesh.alignment = TextAlignment.Center;
+            textMesh.lineSpacing = 0.86f;
             textMesh.color = color;
 
             var renderer = labelObject.GetComponent<MeshRenderer>();
@@ -548,6 +593,12 @@ namespace WorldFarm.Runtime
 
             pinchZooming = false;
 
+            if (Input.touchCount == 1)
+            {
+                HandleSingleTouch(Input.GetTouch(0));
+                return;
+            }
+
             if (Input.GetMouseButtonDown(0))
             {
                 pointerDown = true;
@@ -560,7 +611,7 @@ namespace WorldFarm.Runtime
                 var current = (Vector2)Input.mousePosition;
                 var delta = current - previousPointerPosition;
                 previousPointerPosition = current;
-                if (Vector2.Distance(current, pointerDownPosition) > 18f)
+                if (Vector2.Distance(current, pointerDownPosition) > GetTapThresholdPixels())
                 {
                     PanCamera(delta);
                 }
@@ -571,11 +622,56 @@ namespace WorldFarm.Runtime
                 var upPosition = (Vector2)Input.mousePosition;
                 var moved = Vector2.Distance(upPosition, pointerDownPosition);
                 pointerDown = false;
-                if (moved <= 18f)
+                if (moved <= GetTapThresholdPixels())
                 {
                     TryClick(upPosition);
                 }
             }
+        }
+
+        private void HandleSingleTouch(Touch touch)
+        {
+            if (touch.phase == TouchPhase.Began)
+            {
+                pointerDown = true;
+                pointerDownPosition = touch.position;
+                previousPointerPosition = touch.position;
+                return;
+            }
+
+            if (!pointerDown)
+            {
+                return;
+            }
+
+            if (touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)
+            {
+                var current = touch.position;
+                var delta = current - previousPointerPosition;
+                previousPointerPosition = current;
+                if (Vector2.Distance(current, pointerDownPosition) > GetTapThresholdPixels())
+                {
+                    PanCamera(delta);
+                }
+            }
+            else if (touch.phase == TouchPhase.Ended)
+            {
+                var moved = Vector2.Distance(touch.position, pointerDownPosition);
+                pointerDown = false;
+                if (moved <= GetTapThresholdPixels())
+                {
+                    TryClick(touch.position);
+                }
+            }
+            else if (touch.phase == TouchPhase.Canceled)
+            {
+                pointerDown = false;
+            }
+        }
+
+        private static float GetTapThresholdPixels()
+        {
+            return Screen.dpi > 0f ? Mathf.Clamp(Screen.dpi * 0.10f, 24f, 52f) : 34f;
         }
 
         private void PanCamera(Vector2 delta)
@@ -599,19 +695,29 @@ namespace WorldFarm.Runtime
         private void TryClick(Vector2 screenPosition)
         {
             var ray = sceneCamera.ScreenPointToRay(screenPosition);
-            RaycastHit hit;
-            if (!Physics.Raycast(ray, out hit, 120f))
+            var hits = Physics.RaycastAll(ray, 120f);
+            if (hits.Length == 0)
             {
                 return;
             }
 
-            var target = hit.collider.GetComponent<Prototype3DClickTarget>();
-            if (target == null)
+            Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+            for (var i = 0; i < hits.Length; i++)
             {
+                var target = hits[i].collider.GetComponent<Prototype3DClickTarget>();
+                if (target == null)
+                {
+                    target = hits[i].collider.GetComponentInParent<Prototype3DClickTarget>();
+                }
+
+                if (target == null)
+                {
+                    continue;
+                }
+
+                HandleTargetClick(target.Kind, target.Id);
                 return;
             }
-
-            HandleTargetClick(target.Kind, target.Id);
         }
 
         private void HandleTargetClick(string kind, string id)
@@ -626,6 +732,14 @@ namespace WorldFarm.Runtime
             else if (kind == "plot")
             {
                 game.ActivatePlot(id);
+            }
+            else if (kind == "biome")
+            {
+                var biome = Prototype3DCatalog.GetBiome(id);
+                if (biome != null)
+                {
+                    game.AddLog("地貌：" + biome.ShortName + "，点击圆形地块种植或收获");
+                }
             }
             else if (kind == "cycle_crop" || kind == "next_crop")
             {
@@ -707,10 +821,138 @@ namespace WorldFarm.Runtime
             return Mathf.CeilToInt(seconds / 60f) + "分";
         }
 
+        private static string CompactLabelText(string text, int maxCharsPerLine, int maxLines)
+        {
+            if (string.IsNullOrEmpty(text) || maxCharsPerLine <= 0)
+            {
+                return text;
+            }
+
+            var output = new List<string>();
+            var sourceLines = text.Split('\n');
+            for (var lineIndex = 0; lineIndex < sourceLines.Length; lineIndex++)
+            {
+                var source = sourceLines[lineIndex].Trim();
+                if (source.Length == 0)
+                {
+                    output.Add(string.Empty);
+                    continue;
+                }
+
+                for (var start = 0; start < source.Length; start += maxCharsPerLine)
+                {
+                    var length = Mathf.Min(maxCharsPerLine, source.Length - start);
+                    output.Add(source.Substring(start, length));
+                }
+            }
+
+            if (maxLines > 0 && output.Count > maxLines)
+            {
+                output.RemoveRange(maxLines, output.Count - maxLines);
+                var lastIndex = output.Count - 1;
+                if (lastIndex >= 0 && output[lastIndex].Length > 3)
+                {
+                    output[lastIndex] = output[lastIndex].Substring(0, output[lastIndex].Length - 3) + "...";
+                }
+            }
+
+            return string.Join("\n", output.ToArray());
+        }
+
         private sealed class Prototype3DClickTarget : MonoBehaviour
         {
             public string Kind;
             public string Id;
+        }
+
+        private sealed class Prototype3DLayout
+        {
+            private readonly Camera camera;
+            private readonly Rect safeViewport;
+            private readonly float scale;
+            private readonly float textScale;
+
+            public Prototype3DLayout(Camera camera)
+            {
+                this.camera = camera;
+
+                var screenWidth = Mathf.Max(1f, Screen.width);
+                var screenHeight = Mathf.Max(1f, Screen.height);
+                var safeArea = Screen.safeArea;
+                if (safeArea.width <= 1f || safeArea.height <= 1f)
+                {
+                    safeArea = new Rect(0f, 0f, screenWidth, screenHeight);
+                }
+
+                safeViewport = new Rect(
+                    Mathf.Clamp01(safeArea.xMin / screenWidth),
+                    Mathf.Clamp01(safeArea.yMin / screenHeight),
+                    Mathf.Clamp01(safeArea.width / screenWidth),
+                    Mathf.Clamp01(safeArea.height / screenHeight));
+
+                var aspect = screenWidth / screenHeight;
+                scale = Mathf.Clamp(aspect / 0.56f, 0.84f, 1.18f);
+                textScale = Mathf.Clamp(0.56f / Mathf.Max(0.42f, aspect), 0.82f, 1.04f);
+            }
+
+            public Vector3 Point(float viewportX, float viewportY, float planeY)
+            {
+                var x = Mathf.Lerp(safeViewport.xMin + 0.02f, safeViewport.xMax - 0.02f, Mathf.Clamp01(viewportX));
+                var y = Mathf.Lerp(safeViewport.yMin + 0.02f, safeViewport.yMax - 0.02f, Mathf.Clamp01(viewportY));
+                var ray = camera.ViewportPointToRay(new Vector3(x, y, 0f));
+                var plane = new Plane(Vector3.up, new Vector3(0f, planeY, 0f));
+                float enter;
+                if (plane.Raycast(ray, out enter))
+                {
+                    return ray.GetPoint(enter);
+                }
+
+                return new Vector3(0f, planeY, 0f);
+            }
+
+            public Vector3 Size(float viewportWidth, float height, float viewportHeight)
+            {
+                return new Vector3(
+                    Mathf.Max(0.10f, WorldWidth(viewportWidth)),
+                    height,
+                    Mathf.Max(0.08f, WorldDepth(viewportHeight)));
+            }
+
+            public Vector3 Scale(Vector3 value)
+            {
+                return new Vector3(value.x * scale, value.y, value.z * scale);
+            }
+
+            public float Text(float value)
+            {
+                return value * textScale;
+            }
+
+            public float CropScale(float value)
+            {
+                return value * Mathf.Clamp(scale, 0.88f, 1.10f);
+            }
+
+            public float SmallRadius(float viewportRadius)
+            {
+                return Mathf.Max(0.045f, WorldWidth(viewportRadius));
+            }
+
+            public float WorldWidth(float viewportWidth)
+            {
+                var left = Point(0.50f - viewportWidth * 0.5f, 0.50f, 0f);
+                var right = Point(0.50f + viewportWidth * 0.5f, 0.50f, 0f);
+                return Mathf.Abs(right.x - left.x);
+            }
+
+            private float WorldDepth(float viewportHeight)
+            {
+                var bottom = Point(0.50f, 0.50f - viewportHeight * 0.5f, 0f);
+                var top = Point(0.50f, 0.50f + viewportHeight * 0.5f, 0f);
+                var bottomFlat = new Vector3(bottom.x, 0f, bottom.z);
+                var topFlat = new Vector3(top.x, 0f, top.z);
+                return Vector3.Distance(bottomFlat, topFlat);
+            }
         }
 
         private sealed class Prototype3DMaterials
@@ -728,6 +970,7 @@ namespace WorldFarm.Runtime
             public readonly Material Glass = CreateMaterial("3D Soft Glass", new Color(0.60f, 0.86f, 0.92f), 0.55f);
             public readonly Material MutationCrystal = CreateMaterial("3D Mutation Crystal", new Color(0.46f, 0.82f, 0.86f), 0.68f);
             public readonly Material Button = CreateMaterial("3D Button", new Color(0.96f, 0.74f, 0.34f), 0.26f);
+            public readonly Material ClearTap = CreateMaterial("3D Clear Tap", new Color(1.0f, 0.94f, 0.54f, 0.18f), 0.05f);
             public readonly Material Selected = CreateMaterial("3D Selected", new Color(0.98f, 0.86f, 0.36f), 0.36f);
             public readonly Material Warning = CreateMaterial("3D Warning", new Color(0.92f, 0.48f, 0.28f), 0.22f);
             public readonly Material Locked = CreateMaterial("3D Locked", new Color(0.48f, 0.50f, 0.48f), 0.12f);
@@ -794,6 +1037,19 @@ namespace WorldFarm.Runtime
                 material.color = color;
                 material.SetFloat("_Glossiness", smoothness);
                 material.SetFloat("_Metallic", 0f);
+
+                if (color.a < 0.99f)
+                {
+                    material.SetFloat("_Mode", 3f);
+                    material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+                    material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+                    material.SetInt("_ZWrite", 0);
+                    material.DisableKeyword("_ALPHATEST_ON");
+                    material.EnableKeyword("_ALPHABLEND_ON");
+                    material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
+                    material.renderQueue = 3000;
+                }
+
                 return material;
             }
         }
