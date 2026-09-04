@@ -213,6 +213,46 @@ Verification:
 - Tuanjie batch Bootstrap completed without C# compiler errors.
 - Android development APK rebuilt successfully at `Builds/Android/WorldFarm-prototype-3d.apk`.
 
+### M0.2.2 Device Touch Verification And Git Artifact Rule
+
+Verified and fixed the 3D placeholder prototype directly on Android hardware.
+
+Device used:
+
+- Model: M2102J2SC.
+- Resolution: 1080 x 2340.
+- Density: 440 dpi.
+
+Issue found:
+
+- The app did receive touch input, but raycast-only target detection was unreliable on the phone.
+- Visual elements and collider/raycast hit regions did not always line up with the practical touch positions.
+- Some touches landed on non-click visual geometry or missed small 3D pads.
+
+Changes:
+
+- Added a small runtime touch debug label in the top-left corner.
+- Added screen-space click zones for the main prototype controls and farm targets.
+- Kept 3D raycast as a fallback for editor/mouse use.
+- Enlarged the practical hit zones around seed switching, plots, time buttons, warehouse, order board, and mutation shed.
+- Added frame guarding so the same tap is not processed twice by GUI and input handling.
+- Reduced 3D label scale further for phone readability.
+- Fixed TextMesh orientation so labels face the camera consistently.
+
+Phone verification:
+
+- Seed switching worked on device.
+- Plot planting worked on device.
+- Fast maturity worked on device.
+- Mature crop harvesting worked on device and refreshed warehouse inventory.
+- Warehouse display refreshed after harvest.
+- Mutation shed tap worked on device and increased mutation clue count.
+
+Git artifact rule:
+
+- APK files are local build artifacts by default and should not be pushed to the remote repository unless explicitly requested.
+- `Builds/Android/WorldFarm-prototype-3d.apk` remains usable locally for install/testing but is removed from Git tracking.
+
 ### Notes For Continuing On Another Computer
 
 - Pull the repository.

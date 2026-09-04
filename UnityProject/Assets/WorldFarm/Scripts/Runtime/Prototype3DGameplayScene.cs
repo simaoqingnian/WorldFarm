@@ -14,6 +14,7 @@ namespace WorldFarm.Runtime
 
         private readonly Prototype3DGame game = new Prototype3DGame();
         private readonly List<Transform> labels = new List<Transform>();
+        private readonly List<Prototype3DScreenClickZone> screenClickZones = new List<Prototype3DScreenClickZone>();
 
         private Camera sceneCamera;
         private Transform generatedRoot;
@@ -25,11 +26,13 @@ namespace WorldFarm.Runtime
         private int selectedOrderIndex;
         private int lastScreenWidth;
         private int lastScreenHeight;
+        private int lastGuiClickFrame = -1;
         private float nextRefreshTime;
         private float pinchStartDistance;
         private float pinchStartSize;
         private Vector2 pointerDownPosition;
         private Vector2 previousPointerPosition;
+        private string inputDebug = "触摸调试：等待输入";
 
         private void Awake()
         {
@@ -66,6 +69,48 @@ namespace WorldFarm.Runtime
         private void LateUpdate()
         {
             FaceLabelsToCamera();
+        }
+
+        private void OnGUI()
+        {
+            if (screenClickZones.Count == 0)
+            {
+                return;
+            }
+
+            var debugStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = Mathf.RoundToInt(Mathf.Clamp(Screen.height * 0.014f, 20f, 34f)),
+                normal = { textColor = Color.black },
+                alignment = TextAnchor.MiddleLeft,
+                clipping = TextClipping.Clip
+            };
+
+            GUI.Label(
+                new Rect(Screen.width * 0.035f, Screen.height * 0.020f, Screen.width * 0.76f, Screen.height * 0.035f),
+                inputDebug,
+                debugStyle);
+
+            if (Event.current == null || Event.current.type != EventType.MouseUp || lastGuiClickFrame == Time.frameCount)
+            {
+                return;
+            }
+
+            var mousePosition = Event.current.mousePosition;
+            for (var i = screenClickZones.Count - 1; i >= 0; i--)
+            {
+                var zone = screenClickZones[i];
+                if (!zone.ContainsGuiPosition(mousePosition))
+                {
+                    continue;
+                }
+
+                lastGuiClickFrame = Time.frameCount;
+                inputDebug = "GUI命中：" + zone.DebugName;
+                HandleTargetClick(zone.Kind, zone.Id);
+                Event.current.Use();
+                return;
+            }
         }
 
         private void EnsureCameraAndLights()
@@ -150,6 +195,7 @@ namespace WorldFarm.Runtime
         {
             needsRebuild = false;
             labels.Clear();
+            screenClickZones.Clear();
             materials = new Prototype3DMaterials();
             layout = new Prototype3DLayout(sceneCamera);
 
@@ -214,6 +260,7 @@ namespace WorldFarm.Runtime
                 var center = layout.Point(0.13f, y, 0.16f);
 
                 AddBox("Country " + country.Id, center, layout.Size(0.205f, 0.18f, 0.055f), material, "country", country.Id);
+                AddScreenClickZone("country", country.Id, country.ShortName, 0.13f, y, 0.25f, 0.075f);
                 AddLabel(
                     (selected ? ">" : string.Empty) + country.ShortName + "\n" + (unlocked ? "Lv." + game.GetCountryLevel(country.Id) : "需" + country.RequiredExplorationPoints),
                     layout.Point(0.13f, y, 0.50f),
@@ -242,6 +289,11 @@ namespace WorldFarm.Runtime
                 var material = unlocked ? materials.GetBiomeMaterial(biome.Id) : materials.Locked;
 
                 AddBox("Biome " + biome.Id, center, layout.Size(0.185f, 0.12f, 0.110f), material, unlocked ? "biome" : null, biome.Id);
+                if (unlocked)
+                {
+                    AddScreenClickZone("biome", biome.Id, biome.ShortName, viewportX, viewportY, 0.195f, 0.120f);
+                }
+
                 AddLabel(
                     biome.ShortName + "\n" + (unlocked ? "槽位" + biome.SlotCount : "声望Lv." + biome.RequiredReputationLevel),
                     layout.Point(viewportX, viewportY + 0.040f, 0.45f),
@@ -270,6 +322,10 @@ namespace WorldFarm.Runtime
                 var padMaterial = !unlocked ? materials.Locked : plot.status == Prototype3DPlotStatus.Mature ? materials.MaturePad : plot.status == Prototype3DPlotStatus.Growing ? materials.GrowingPad : materials.EmptyPad;
 
                 AddCylinder("Plot " + plot.plotId, position, layout.SmallRadius(0.028f), 0.06f, padMaterial, unlocked ? "plot" : null, plot.plotId);
+                if (unlocked)
+                {
+                    AddScreenClickZone("plot", plot.plotId, "地块" + (i + 1), viewportX + local.x, viewportY + local.z, 0.070f, 0.060f);
+                }
 
                 if (plot.status != Prototype3DPlotStatus.Empty)
                 {
@@ -307,6 +363,7 @@ namespace WorldFarm.Runtime
         {
             var crop = game.GetSelectedCrop();
             AddBox("Seed Rack", layout.Point(0.86f, 0.735f, 0.18f), layout.Size(0.210f, 0.20f, 0.235f), materials.Wood, null, null);
+            AddScreenClickZone("cycle_crop", string.Empty, "种子", 0.86f, 0.745f, 0.220f, 0.210f);
             AddLabel("种子", layout.Point(0.86f, 0.845f, 0.50f), layout.Text(0.046f), materials.TextDark.color);
 
             AddCylinder("Selected Seed Pedestal", layout.Point(0.86f, 0.750f, 0.33f), layout.SmallRadius(0.045f), 0.12f, materials.Panel, "cycle_crop", string.Empty);
@@ -317,8 +374,10 @@ namespace WorldFarm.Runtime
             }
 
             AddBox("Prev Crop Button", layout.Point(0.805f, 0.590f, 0.28f), layout.Size(0.090f, 0.18f, 0.055f), materials.Button, "prev_crop", string.Empty);
+            AddScreenClickZone("prev_crop", string.Empty, "上个种子", 0.805f, 0.590f, 0.105f, 0.070f);
             AddLabel("上", layout.Point(0.805f, 0.590f, 0.58f), layout.Text(0.032f), materials.TextDark.color);
             AddBox("Next Crop Button", layout.Point(0.915f, 0.590f, 0.28f), layout.Size(0.090f, 0.18f, 0.055f), materials.Button, "next_crop", string.Empty);
+            AddScreenClickZone("next_crop", string.Empty, "下个种子", 0.915f, 0.590f, 0.105f, 0.070f);
             AddLabel("下", layout.Point(0.915f, 0.590f, 0.58f), layout.Text(0.032f), materials.TextDark.color);
 
             var biome = game.GetSelectedBiomeForCropPreview();
@@ -340,6 +399,7 @@ namespace WorldFarm.Runtime
         {
             var origin = layout.Point(viewportX, viewportY, 0f);
             AddBox("Warehouse Tap Pad", layout.Point(viewportX, viewportY, 0.05f), layout.Size(0.245f, 0.08f, 0.125f), materials.ClearTap, "warehouse", string.Empty);
+            AddScreenClickZone("warehouse", string.Empty, "仓库", viewportX, viewportY, 0.260f, 0.190f);
             AddBox("Warehouse Body", origin + new Vector3(0f, 0.42f, 0f), layout.Scale(new Vector3(0.72f, 0.66f, 0.56f)), materials.Warehouse, "warehouse", string.Empty);
             AddBox("Warehouse Roof", origin + new Vector3(0f, 0.80f, 0f), layout.Scale(new Vector3(0.88f, 0.18f, 0.66f)), materials.RoofRed, "warehouse", string.Empty);
             AddBox("Warehouse Door", origin + new Vector3(0f, 0.25f, -0.26f), layout.Scale(new Vector3(0.30f, 0.32f, 0.05f)), materials.Door, "warehouse", string.Empty);
@@ -351,6 +411,7 @@ namespace WorldFarm.Runtime
         {
             var origin = layout.Point(viewportX, viewportY, 0f);
             AddBox("Order Tap Pad", layout.Point(viewportX, viewportY, 0.05f), layout.Size(0.260f, 0.08f, 0.125f), materials.ClearTap, "order", string.Empty);
+            AddScreenClickZone("order", string.Empty, "订单牌", viewportX, viewportY, 0.270f, 0.205f);
             AddCylinder("Order Post L", origin + new Vector3(-layout.WorldWidth(0.055f), 0.40f, 0f), layout.SmallRadius(0.007f), 0.60f, materials.Door, "order", string.Empty);
             AddCylinder("Order Post R", origin + new Vector3(layout.WorldWidth(0.055f), 0.40f, 0f), layout.SmallRadius(0.007f), 0.60f, materials.Door, "order", string.Empty);
             AddBox("Order Board", origin + new Vector3(0f, 0.76f, -0.02f), layout.Scale(new Vector3(0.88f, 0.50f, 0.10f)), materials.OrderBoard, "order", string.Empty);
@@ -374,6 +435,7 @@ namespace WorldFarm.Runtime
                 9,
                 2);
             AddBox("Order Submit Button", layout.Point(viewportX, viewportY - 0.082f, 0.18f), layout.Size(0.185f, 0.18f, 0.052f), canSubmit ? materials.Button : materials.Locked, "order", string.Empty);
+            AddScreenClickZone("order", string.Empty, canSubmit ? "提交订单" : "切换订单", viewportX, viewportY - 0.082f, 0.205f, 0.070f);
             AddLabel(canSubmit ? "提交" : "缺货", layout.Point(viewportX, viewportY - 0.082f, 0.50f), layout.Text(0.032f), canSubmit ? materials.TextDark.color : materials.TextMuted.color);
         }
 
@@ -381,6 +443,7 @@ namespace WorldFarm.Runtime
         {
             var origin = layout.Point(viewportX, viewportY, 0f);
             AddBox("Mutation Tap Pad", layout.Point(viewportX, viewportY, 0.05f), layout.Size(0.245f, 0.08f, 0.125f), materials.ClearTap, "mutation", string.Empty);
+            AddScreenClickZone("mutation", string.Empty, "变异棚", viewportX, viewportY, 0.260f, 0.205f);
             AddBox("Mutation Lab Base", origin + new Vector3(0f, 0.36f, 0f), layout.Scale(new Vector3(0.70f, 0.52f, 0.56f)), materials.MutationLab, "mutation", string.Empty);
             AddCylinder("Mutation Lab Dome", origin + new Vector3(0f, 0.72f, 0f), layout.SmallRadius(0.047f), 0.18f, materials.Glass, "mutation", string.Empty);
             AddCylinder("Mutation Crystal", origin + new Vector3(0f, 0.96f, -0.06f), layout.SmallRadius(0.014f), 0.28f, materials.MutationCrystal, "mutation", string.Empty);
@@ -403,18 +466,22 @@ namespace WorldFarm.Runtime
                 2);
 
             AddBox("Mutation Main Button", layout.Point(viewportX, viewportY - 0.082f, 0.18f), layout.Size(0.185f, 0.18f, 0.052f), stable ? materials.Selected : materials.Button, "mutation", string.Empty);
+            AddScreenClickZone("mutation", string.Empty, stable ? "已稳定" : "变异操作", viewportX, viewportY - 0.082f, 0.205f, 0.070f);
             AddLabel(stable ? "已稳定" : game.CanStabilizeMutation(rule) ? "稳定" : "线索", layout.Point(viewportX, viewportY - 0.082f, 0.50f), layout.Text(0.032f), materials.TextDark.color);
         }
 
         private void BuildTimeControls()
         {
             AddBox("Time Button 10m", layout.Point(0.27f, 0.380f, 0.18f), layout.Size(0.170f, 0.18f, 0.055f), materials.Button, "time10", string.Empty);
+            AddScreenClickZone("time10", string.Empty, "+10分", 0.27f, 0.380f, 0.185f, 0.080f);
             AddLabel("+10分", layout.Point(0.27f, 0.380f, 0.50f), layout.Text(0.034f), materials.TextDark.color);
 
             AddBox("Mature All Button", layout.Point(0.50f, 0.380f, 0.18f), layout.Size(0.180f, 0.18f, 0.055f), materials.Button, "mature_all", string.Empty);
+            AddScreenClickZone("mature_all", string.Empty, "全成熟", 0.50f, 0.380f, 0.195f, 0.080f);
             AddLabel("全成熟", layout.Point(0.50f, 0.380f, 0.50f), layout.Text(0.034f), materials.TextDark.color);
 
             AddBox("Reset Button", layout.Point(0.73f, 0.380f, 0.18f), layout.Size(0.170f, 0.18f, 0.055f), materials.Warning, "reset", string.Empty);
+            AddScreenClickZone("reset", string.Empty, "重置", 0.73f, 0.380f, 0.185f, 0.080f);
             AddLabel("重置", layout.Point(0.73f, 0.380f, 0.50f), layout.Text(0.034f), materials.TextDark.color);
         }
 
@@ -544,6 +611,18 @@ namespace WorldFarm.Runtime
             var target = targetObject.AddComponent<Prototype3DClickTarget>();
             target.Kind = clickKind;
             target.Id = clickId;
+        }
+
+        private void AddScreenClickZone(string kind, string id, string debugName, float centerX, float centerY, float width, float height)
+        {
+            var adjustedCenterY = Mathf.Clamp01(centerY - 0.045f);
+            var adjustedWidth = Mathf.Clamp(width * 1.25f, 0.080f, 0.360f);
+            var adjustedHeight = Mathf.Clamp(height * 1.45f, 0.090f, 0.310f);
+            screenClickZones.Add(new Prototype3DScreenClickZone(kind, id, debugName, new Rect(
+                Mathf.Clamp01(centerX - adjustedWidth * 0.5f),
+                Mathf.Clamp01(adjustedCenterY - adjustedHeight * 0.5f),
+                Mathf.Clamp01(adjustedWidth),
+                Mathf.Clamp01(adjustedHeight))));
         }
 
         private TextMesh AddLabel(string text, Vector3 position, float characterSize, Color color, int maxCharsPerLine = 0, int maxLines = 0)
@@ -694,10 +773,21 @@ namespace WorldFarm.Runtime
 
         private void TryClick(Vector2 screenPosition)
         {
+            if (lastGuiClickFrame == Time.frameCount)
+            {
+                return;
+            }
+
+            if (TryScreenClick(screenPosition, "屏幕"))
+            {
+                return;
+            }
+
             var ray = sceneCamera.ScreenPointToRay(screenPosition);
             var hits = Physics.RaycastAll(ray, 120f);
             if (hits.Length == 0)
             {
+                inputDebug = "未命中：" + Mathf.RoundToInt(screenPosition.x) + "," + Mathf.RoundToInt(screenPosition.y);
                 return;
             }
 
@@ -715,9 +805,30 @@ namespace WorldFarm.Runtime
                     continue;
                 }
 
+                inputDebug = "3D命中：" + target.Kind + " " + target.Id;
                 HandleTargetClick(target.Kind, target.Id);
                 return;
             }
+
+            inputDebug = "3D无目标：" + Mathf.RoundToInt(screenPosition.x) + "," + Mathf.RoundToInt(screenPosition.y);
+        }
+
+        private bool TryScreenClick(Vector2 screenPosition, string source)
+        {
+            for (var i = screenClickZones.Count - 1; i >= 0; i--)
+            {
+                var zone = screenClickZones[i];
+                if (!zone.ContainsScreenPosition(screenPosition))
+                {
+                    continue;
+                }
+
+                inputDebug = source + "命中：" + zone.DebugName;
+                HandleTargetClick(zone.Kind, zone.Id);
+                return true;
+            }
+
+            return false;
         }
 
         private void HandleTargetClick(string kind, string id)
@@ -802,7 +913,7 @@ namespace WorldFarm.Runtime
                     continue;
                 }
 
-                label.rotation = Quaternion.LookRotation(label.position - sceneCamera.transform.position, Vector3.up);
+                label.rotation = sceneCamera.transform.rotation;
             }
         }
 
@@ -865,6 +976,34 @@ namespace WorldFarm.Runtime
             public string Id;
         }
 
+        private sealed class Prototype3DScreenClickZone
+        {
+            public readonly string Kind;
+            public readonly string Id;
+            public readonly string DebugName;
+            private readonly Rect rect;
+
+            public Prototype3DScreenClickZone(string kind, string id, string debugName, Rect rect)
+            {
+                Kind = kind;
+                Id = id;
+                DebugName = debugName;
+                this.rect = rect;
+            }
+
+            public bool ContainsScreenPosition(Vector2 screenPosition)
+            {
+                var viewportPosition = new Vector2(screenPosition.x / Mathf.Max(1f, Screen.width), screenPosition.y / Mathf.Max(1f, Screen.height));
+                return rect.Contains(viewportPosition);
+            }
+
+            public bool ContainsGuiPosition(Vector2 guiPosition)
+            {
+                var viewportPosition = new Vector2(guiPosition.x / Mathf.Max(1f, Screen.width), 1f - guiPosition.y / Mathf.Max(1f, Screen.height));
+                return rect.Contains(viewportPosition);
+            }
+        }
+
         private sealed class Prototype3DLayout
         {
             private readonly Camera camera;
@@ -892,7 +1031,7 @@ namespace WorldFarm.Runtime
 
                 var aspect = screenWidth / screenHeight;
                 scale = Mathf.Clamp(aspect / 0.56f, 0.84f, 1.18f);
-                textScale = Mathf.Clamp(0.56f / Mathf.Max(0.42f, aspect), 0.82f, 1.04f);
+                textScale = Mathf.Clamp(0.56f / Mathf.Max(0.42f, aspect), 0.82f, 1.04f) * 0.56f;
             }
 
             public Vector3 Point(float viewportX, float viewportY, float planeY)
